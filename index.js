@@ -6,7 +6,7 @@ const { getAbi, getAddress } = require("@uma/core");
 // --url: node url, by default points at http://localhost:8545.
 // --mnemonic: an account mnemonic you'd like to use. The script will default to using the node's unlocked accounts.
 const argv = require("minimist")(process.argv.slice(), {
-  string: ["url", "mnemonic"]
+  string: ["url", "mnemonic"],
 });
 if (!argv.gasprice) throw "--gasprice required (in GWEI)";
 if (typeof argv.gasprice !== "number") throw "--gasprice must be a number";
@@ -19,10 +19,10 @@ if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between
   // See HDWalletProvider documentation: https://www.npmjs.com/package/@truffle/hdwallet-provider.
   const hdwalletOptions = {
     mnemonic: {
-      phrase: argv.mnemonic
+      phrase: argv.mnemonic,
     },
     providerOrUrl: url,
-    addressIndex: 0 // Change this to use the nth account.
+    addressIndex: 0, // Change this to use the nth account.
   };
 
   // Initialize web3 with an HDWalletProvider if a mnemonic was provided. Otherwise, just give it the url.
@@ -43,7 +43,7 @@ if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between
     minSponsorTokens: { rawValue: toWei("100") }, // Min sponsor position size of 100 synthetic tokens.
     liquidationLiveness: 7200, // 2 hour liquidation liveness.
     withdrawalLiveness: 7200, // 2 hour withdrawal liveness.
-    excessTokenBeneficiary: "0x54f44eA3D2e7aA0ac089c4d8F7C93C27844057BF" // UMA Store contract.
+    excessTokenBeneficiary: "0x54f44eA3D2e7aA0ac089c4d8F7C93C27844057BF", // UMA Store contract.
   };
 
   const accounts = await web3.eth.getAccounts();
@@ -60,7 +60,7 @@ if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between
   const transactionOptions = {
     gas: 12000000, // 12MM is very high. Set this lower if you only have < 2 ETH or so in your wallet.
     gasPrice: argv.gasprice, // gasprice arg
-    from: account
+    from: account,
   };
 
   // Simulate transaction to test before sending to the network.
@@ -71,7 +71,7 @@ if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between
   // Since the simulated transaction succeeded, send the real one to the network.
   const { transactionHash } = await empCreator.methods.createExpiringMultiParty(empParams).send(transactionOptions);
   console.log("Deployed in transaction:", transactionHash);
-})().catch(e => {
+})().catch((e) => {
   console.error(e);
   process.exit(1); // Exit with a nonzero exit code to signal failure.
 });

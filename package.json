@@ -4,10 +4,9 @@
   "description": "Example stub repo to help launch an EMP",
   "private": true,
   "scripts": {
-    "lint": "npm run eslint && npm run prettier -- --list-different",
-    "lint-fix": "npm run eslint -- --fix && npm run prettier -- --write",
-    "eslint": "eslint './**/*.js'",
-    "prettier": "prettier './**/*.js' './**/*.sol' './**/*.md'",
+    "lint": "yarn run prettier --list-different",
+    "lint-fix": "yarn run prettier --write",
+    "prettier": "prettier './**/*.js' './**/*.md'",
     "ganache-fork": "yarn ganache-cli -l 12000000 --fork"
   },
   "author": "UMA Team",
@@ -17,22 +16,8 @@
     "url": "https://github.com/UMAprotocol/launch-emp.git"
   },
   "devDependencies": {
-    "eslint": "^7.9.0",
-    "eslint-config-prettier": "^6.10.1",
-    "eslint-plugin-prettier": "^3.1.2",
     "ganache-cli": "6.11.0",
-    "husky": "^4.2.3",
-    "lint-staged": "^10.5.3",
-    "prettier": "1.19.1",
-    "pretty-quick": "^2.0.1"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "echo '🕺 Running eslint on staged files' && lint-staged --allow-empty && echo '🏃‍♂️ Running pretty-quick on staged files' && pretty-quick --staged"
-    }
-  },
-  "lint-staged": {
-    "*.js": "eslint --cache --fix"
+    "prettier": "^2.2.1"
   },
   "dependencies": {
     "@truffle/hdwallet-provider": "^1.2.1",
