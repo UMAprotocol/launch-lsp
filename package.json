@@ -7,7 +7,8 @@
     "lint": "npm run eslint && npm run prettier -- --list-different",
     "lint-fix": "npm run eslint -- --fix && npm run prettier -- --write",
     "eslint": "eslint './**/*.js'",
-    "prettier": "prettier './**/*.js' './**/*.sol' './**/*.md'"
+    "prettier": "prettier './**/*.js' './**/*.sol' './**/*.md'",
+    "ganache-fork": "yarn ganache-cli -l 12000000 --fork"
   },
   "author": "UMA Team",
   "license": "AGPL-3.0",
@@ -19,7 +20,7 @@
     "eslint": "^7.9.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-prettier": "^3.1.2",
-    "ganache-cli": "^6.12.1",
+    "ganache-cli": "6.11.0",
     "husky": "^4.2.3",
     "lint-staged": "^10.5.3",
     "prettier": "1.19.1",

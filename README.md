@@ -24,14 +24,32 @@ sudo apt-get update && sudo apt-get install -y libudev-dev libusb-1.0-0-dev
 yarn
 ```
 
-## Run the deployment script
+## Run the deployment script on a mainnet fork
+
+It's a good idea to try out your deployment on a fork before running it on mainnet. This will allow you to run the
+deployment in a forked environment and interact with it to ensure it works as expected.
+
+Start ganache.
 
 ```bash
-node index.js --gasprice 50 --url your.node.url.io --mnemonic "your mnemonic"
+yarn ganache-fork your.node.url.io
 ```
 
-Note: this deployment script should work on mainnet and kovan. It should technically work on ganache forks of these
-networks as well, but in our testing, ganache has often returned false reverts during the deployment process.
+In a separate terminal, run the deployment script (it defaults to using localhost:8545 as the ETH node, which is
+desired in this case). Note: mnemonic is optional here -- without it, ganache will use its default pre-loaded account.
+
+```bash
+node index.js --gasprice 50 --mnemonic "your mnemonic (12 word seed phrase)"
+```
+
+Now you should be able to use `localhost:8545` to interact with a forked version of mainnet (or kovan) where your
+contract is deployed.
+
+## Run the deployment script on mainnet or kovan
+
+```bash
+node index.js --gasprice 50 --url your.node.url.io --mnemonic "your mnemonic (12 word seed phrase)"
+```
 
 ## Customize the script
 
