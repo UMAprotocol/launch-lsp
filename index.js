@@ -59,7 +59,7 @@ if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between
   // Transaction parameters
   const transactionOptions = {
     gas: 12000000, // 12MM is very high. Set this lower if you only have < 2 ETH or so in your wallet.
-    gasPrice: argv.gasprice, // gasprice arg
+    gasPrice: argv.gasprice * 1000000000, // gasprice arg * 1 GWEI
     from: account,
   };
 
