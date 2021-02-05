@@ -1,9 +1,9 @@
-# Stub Package for Launching a new EMP
+# Stub Package for Launching a New EMP
 
-The purpose of this repository/package is to make it easy to customize your EMP Deployment. Feel free to use this
+The purpose of this repository/package is to make it easy to customize your EMP deployment. Feel free to use this
 repository in place or fork and customize it.
 
-## System Dependencies
+## Install system dependencies
 
 You will need to install nodejs v12 (we recommend `nvm` to manage node versions) and yarn.
 
@@ -18,7 +18,7 @@ Example ubuntu installation command for additional deps:
 sudo apt-get update && sudo apt-get install -y libudev-dev libusb-1.0-0-dev
 ```
 
-## Install Packages
+## Install packages
 
 ```bash
 yarn
