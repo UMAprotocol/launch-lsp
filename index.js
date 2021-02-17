@@ -5,9 +5,24 @@ const { getAbi, getAddress } = require("@uma/core");
 // Optional arguments:
 // --url: node url, by default points at http://localhost:8545.
 // --mnemonic: an account mnemonic you'd like to use. The script will default to using the node's unlocked accounts.
+// Mandatory arguments:
+// --gasprice: gas price to use in GWEI
+// --priceFeedIdentifier: price identifier to use.
+// --collateralAddress: collateral token address.
+// --expirationTimestamp: timestamp that the contract will expire at.
+// --syntheticName: long name.
+// --syntheticSymbol: short name.
+// --minSponsorTokens: minimum sponsor position size
+
 const argv = require("minimist")(process.argv.slice(), {
-  string: ["url", "mnemonic"],
+  string: ["url", "mnemonic", "priceFeedIdentifier", "collateralAddress", "expirationTimestamp", "syntheticName", "syntheticSymbol", "minSponsorTokens"]
 });
+if (!argv.priceFeedIdentifier) throw "--priceFeedIdentifier required";
+if (!argv.collateralAddress) throw "--collateralAddress required";
+if (!argv.expirationTimestamp) throw "--expirationTimestamp required";
+if (!argv.syntheticName) throw "--syntheticName required";
+if (!argv.syntheticSymbol) throw "--syntheticSymbol required";
+if (!argv.minSponsorTokens) throw "--minSponsorTokens required";
 if (!argv.gasprice) throw "--gasprice required (in GWEI)";
 if (typeof argv.gasprice !== "number") throw "--gasprice must be a number";
 if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between 1 and 1000 (GWEI)";
@@ -35,18 +50,18 @@ if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between
   const account = accounts[0];
   const networkId = await web3.eth.net.getId();
 
-  // Example EMP Parameters. Customize these.
+  // EMP Parameters. Pass in arguments to customize these.
   const empParams = {
-    expirationTimestamp: "1640995200", // 01/01/2022 @ 0:00 (UTC)
-    collateralAddress: "0xd0a1e359811322d97991e03f863a0c30c2cf029c", // Kovan WETH address. Mainnet WETH is: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2.
-    priceFeedIdentifier: padRight(utf8ToHex("USDETH"), 64), // Using the USDETH price.
-    syntheticName: "uUSDwETH Synthetic Token Expiring 1 January 2022", // Long name.
-    syntheticSymbol: "uUSDwETH-JAN", // Short name.
+    expirationTimestamp: argv.expirationTimestamp.toString(), // Timestamp that the contract will expire at.
+    collateralAddress: argv.collateralAddress.toString(), // Collateral token address.
+    priceFeedIdentifier: padRight(utf8ToHex(argv.priceFeedIdentifier.toString()), 64), // Price identifier to use.
+    syntheticName: argv.syntheticName, // Long name.
+    syntheticSymbol: argv.syntheticSymbol, // Short name.
     collateralRequirement: { rawValue: toWei("1.25") }, // 125% collateral req.
     disputeBondPct: { rawValue: toWei("0.1") }, // 10% dispute bond.
-    sponsorDisputeRewardPct: { rawValue: toWei("0.05") }, // 5% reward for sponsors who are disputed invalidly
+    sponsorDisputeRewardPct: { rawValue: toWei("0.05") }, // 5% reward for sponsors who are disputed invalidly.
     disputerDisputeRewardPct: { rawValue: toWei("0.2") }, // 20% reward for correct disputes.
-    minSponsorTokens: { rawValue: toWei("100") }, // Min sponsor position size of 100 synthetic tokens.
+    minSponsorTokens: { rawValue: toWei(argv.minSponsorTokens.toString()) }, // Minimum sponsor position size.
     liquidationLiveness: 7200, // 2 hour liquidation liveness.
     withdrawalLiveness: 7200, // 2 hour withdrawal liveness.
     excessTokenBeneficiary:  getAddress("Store", networkId), // UMA Store contract.
