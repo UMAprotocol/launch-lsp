@@ -58,13 +58,13 @@ if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between
     syntheticName: argv.syntheticName, // Long name.
     syntheticSymbol: argv.syntheticSymbol, // Short name.
     collateralRequirement: { rawValue: toWei("1.25") }, // 125% collateral req.
-    disputeBondPct: { rawValue: toWei("0.1") }, // 10% dispute bond.
-    sponsorDisputeRewardPct: { rawValue: toWei("0.05") }, // 5% reward for sponsors who are disputed invalidly.
-    disputerDisputeRewardPct: { rawValue: toWei("0.2") }, // 20% reward for correct disputes.
+    disputeBondPercentage: { rawValue: toWei("0.1") }, // 10% dispute bond.
+    sponsorDisputeRewardPercentage: { rawValue: toWei("0.05") }, // 5% reward for sponsors who are disputed invalidly.
+    disputerDisputeRewardPercentage: { rawValue: toWei("0.2") }, // 20% reward for correct disputes.
     minSponsorTokens: { rawValue: toWei(argv.minSponsorTokens.toString()) }, // Minimum sponsor position size.
     liquidationLiveness: 7200, // 2 hour liquidation liveness.
     withdrawalLiveness: 7200, // 2 hour withdrawal liveness.
-    excessTokenBeneficiary:  getAddress("Store", networkId), // UMA Store contract.
+    financialProductLibraryAddress: "0x0000000000000000000000000000000000000000", // 0x0 because, by default, we don't want to use a custom library.
   };
 
   const empCreator = new web3.eth.Contract(
