@@ -20,6 +20,7 @@
     "prettier": "^2.2.1"
   },
   "dependencies": {
+    "@ethersproject/bignumber": "^5.0.14",
     "@truffle/hdwallet-provider": "^1.2.1",
     "@uma/core": "^2.0.1",
     "minimist": "^1.2.5",

@@ -1,6 +1,7 @@
 const Web3 = require("web3");
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 const { getAbi, getAddress } = require("@uma/core");
+const { parseFixed } = require("@ethersproject/bignumber");
 
 // Optional arguments:
 // --url: node url, by default points at http://localhost:8545.
@@ -51,6 +52,14 @@ const libraryAddress = argv.libraryAddress ? argv.libraryAddress : "0x0000000000
   const account = accounts[0];
   const networkId = await web3.eth.net.getId();
 
+  // Grab collateral decimals.
+  const collateral = new web3.eth.Contract(
+    getAbi("IERC20Standard"),
+    argv.collateralAddress
+  );
+  const decimals = (await collateral.methods.decimals().call()).toString();
+
+
   // EMP Parameters. Pass in arguments to customize these.
   const empParams = {
     expirationTimestamp: argv.expirationTimestamp.toString(), // Timestamp that the contract will expire at.
@@ -62,7 +71,7 @@ const libraryAddress = argv.libraryAddress ? argv.libraryAddress : "0x0000000000
     disputeBondPercentage: { rawValue: toWei("0.1") }, // 10% dispute bond.
     sponsorDisputeRewardPercentage: { rawValue: toWei("0.05") }, // 5% reward for sponsors who are disputed invalidly
     disputerDisputeRewardPercentage: { rawValue: toWei("0.2") }, // 20% reward for correct disputes.
-    minSponsorTokens: { rawValue: toWei(argv.minSponsorTokens.toString()) }, // Minimum sponsor position size.
+    minSponsorTokens: { rawValue: parseFixed(argv.minSponsorTokens.toString(), decimals) }, // Minimum sponsor position size.
     liquidationLiveness: 7200, // 2 hour liquidation liveness.
     withdrawalLiveness: 7200, // 2 hour withdrawal liveness.
     financialProductLibraryAddress: libraryAddress, // Default to 0x0 if no address is passed.
