@@ -5,7 +5,7 @@ repository in place or fork and customize it.
 
 ## Install system dependencies
 
-You will need to install nodejs v12 (we recommend `nvm` to manage node versions) and yarn.
+You will need to install nodejs (we recommend the latest stable version, nodejs v14, and `nvm` to manage node versions) and yarn.
 
 Note: these additional dependencies are required -- you may or may not have them on your system already:
 

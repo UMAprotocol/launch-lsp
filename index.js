@@ -15,7 +15,7 @@ const { getAbi, getAddress } = require("@uma/core");
 // --minSponsorTokens: minimum sponsor position size
 
 const argv = require("minimist")(process.argv.slice(), {
-  string: ["url", "mnemonic", "priceFeedIdentifier", "collateralAddress", "expirationTimestamp", "syntheticName", "syntheticSymbol", "minSponsorTokens"]
+  string: ["url", "mnemonic", "priceFeedIdentifier", "collateralAddress", "expirationTimestamp", "syntheticName", "syntheticSymbol", "minSponsorTokens", "libraryAddress"]
 });
 if (!argv.priceFeedIdentifier) throw "--priceFeedIdentifier required";
 if (!argv.collateralAddress) throw "--collateralAddress required";
@@ -26,6 +26,7 @@ if (!argv.minSponsorTokens) throw "--minSponsorTokens required";
 if (!argv.gasprice) throw "--gasprice required (in GWEI)";
 if (typeof argv.gasprice !== "number") throw "--gasprice must be a number";
 if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between 1 and 1000 (GWEI)";
+const libraryAddress = argv.libraryAddress ? argv.libraryAddress : "0x0000000000000000000000000000000000000000";
 
 // Wrap everything in an async function to allow the use of async/await.
 (async () => {
@@ -59,12 +60,12 @@ if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between
     syntheticSymbol: argv.syntheticSymbol, // Short name.
     collateralRequirement: { rawValue: toWei("1.25") }, // 125% collateral req.
     disputeBondPercentage: { rawValue: toWei("0.1") }, // 10% dispute bond.
-    sponsorDisputeRewardPercentage: { rawValue: toWei("0.05") }, // 5% reward for sponsors who are disputed invalidly.
+    sponsorDisputeRewardPercentage: { rawValue: toWei("0.05") }, // 5% reward for sponsors who are disputed invalidly
     disputerDisputeRewardPercentage: { rawValue: toWei("0.2") }, // 20% reward for correct disputes.
     minSponsorTokens: { rawValue: toWei(argv.minSponsorTokens.toString()) }, // Minimum sponsor position size.
     liquidationLiveness: 7200, // 2 hour liquidation liveness.
     withdrawalLiveness: 7200, // 2 hour withdrawal liveness.
-    financialProductLibraryAddress: "0x0000000000000000000000000000000000000000", // 0x0 because, by default, we don't want to use a custom library.
+    financialProductLibraryAddress: libraryAddress, // Default to 0x0 if no address is passed.
   };
 
   const empCreator = new web3.eth.Contract(
@@ -87,6 +88,7 @@ if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between
   // Since the simulated transaction succeeded, send the real one to the network.
   const { transactionHash } = await empCreator.methods.createExpiringMultiParty(empParams).send(transactionOptions);
   console.log("Deployed in transaction:", transactionHash);
+  process.exit(0);
 })().catch((e) => {
   console.error(e);
   process.exit(1); // Exit with a nonzero exit code to signal failure.
