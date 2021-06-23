@@ -1,7 +1,7 @@
 {
-  "name": "launch-emp",
+  "name": "launch-lsp",
   "version": "1.0.0",
-  "description": "Example stub repo to help launch an EMP",
+  "description": "Example stub repo to help launch an LSP",
   "private": true,
   "scripts": {
     "lint": "yarn run prettier --list-different",
@@ -13,7 +13,7 @@
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/UMAprotocol/launch-emp.git"
+    "url": "https://github.com/UMAprotocol/launch-lsp.git"
   },
   "devDependencies": {
     "ganache-cli": "6.11.0",
