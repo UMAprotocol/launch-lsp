@@ -1,18 +1,19 @@
-# Stub Package for Launching a New EMP
+# Stub Package for Launching a New LSP
 
-The purpose of this repository/package is to make it easy to customize your EMP deployment. Feel free to use this
-repository in place or fork and customize it.
+The purpose of this repository/package is to make it easy to customize your LSP (Long-Short Pair) deployment. Feel free to use this repository in place or fork and customize it.
+
+For more information on the LSP, [read the docs](https://umaproject.org/lsp.html).
 
 ## Install system dependencies
 
-You will need to install nodejs v12 (we recommend `nvm` to manage node versions) and yarn.
+You will need to install nodejs (we recommend the latest stable version, nodejs v14, and nvm to manage node versions) and yarn.
 
 Note: these additional dependencies are required -- you may or may not have them on your system already:
 
 - `libudev`
 - `libusb`
 
-These dependencies are installed on MacOSX by installing the XCode Developer Tools. For Linux, the example ubuntu installation command for additional deps is:
+These dependencies are installed on MacOSX by installing the XCode Developer Tools. For Linux, the example Ubuntu installation command for additional dependencies is:
 
 ```bash
 sudo apt-get update && sudo apt-get install -y libudev-dev libusb-1.0-0-dev
@@ -58,9 +59,9 @@ It is recommended to keep the default empParams struct and only customize your c
 
 ## Deploying financial product libraries
 
-We have several [financial product libraries](https://github.com/UMAprotocol/protocol/tree/master/packages/core/contracts/financial-templates/common/financial-product-libraries) available for transforming the price, identifier, or collateral requirement of an EMP before or after expiry. However, you may find yourself in need of a custom financial product library for your use case.
+We have several [financial product libraries](https://github.com/UMAprotocol/protocol/tree/master/packages/core/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries) available for transforming the price, identifier, or collateral requirement of an LSP before or after expiry. However, you may find yourself in need of a custom financial product library for your use case.
 
-If so, fork the [protocol repo](https://github.com/UMAprotocol/protocol) and add your `CustomFinancialProductLibrary` Solidity file to [/packages/core/contracts/financial-templates/common/financial-product-libraries](https://github.com/UMAprotocol/protocol/tree/master/packages/core/contracts/financial-templates/common/financial-product-libraries). You will probably want a different name for your library, but this is an example!
+If so, fork the [protocol repo](https://github.com/UMAprotocol/protocol) and add your `CustomFinancialProductLibrary` Solidity file to [/packages/core/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries](https://github.com/UMAprotocol/protocol/tree/master/packages/core/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries). You will probably want a different name for your library, but this is an example!
 
 Then take the following steps to deploy and verify the contract. Sorry that it's a bit complicated! We're working on a simpler workflow, probably using Hardhat deployment.
 
@@ -70,7 +71,7 @@ Then take the following steps to deploy and verify the contract. Sorry that it's
 4. In the Truffle console, run `const fpl = await CustomFinancialProductLibrary.new({gasPrice: currentGasPriceInWei})`, filling in the current gas price. You can find prices in Gwei at [ETH Gas Station](https://www.ethgasstation.info/), and need to add nine zeroes to convert the Gwei price to wei. For example, if the current gas price in Gwei is `85`, you should enter `85000000000` in the place of `currentGasPriceInWei`. Make sure you have enough ETH in your wallet!
 5. After deployment, still in the Truffle console, run `fpl.address`. This will output the deployed address of `CustomFinancialProductLibrary`.
 6. Make a note of the deployed address and exit Truffle console.
-7. Open `packages/core/artifacts/contracts/financial-templates/common/financial-product-libraries/CustomFinancialProductLibrary/CustomFinancialProductLibrary.dbg.json`. It should show some metadata about your Hardhat build, including the `buildInfo` file, which should look like `"../../../../../build-info/example.json"`. Open the `example.json` file in the `build-info` directory.
+7. Open `packages/core/artifacts/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries/CustomFinancialProductLibrary/CustomFinancialProductLibrary.dbg.json`. It should show some metadata about your Hardhat build, including the `buildInfo` file, which should look like `"../../../../../../build-info/example.json"`. Open the `example.json` file in the `build-info` directory.
 8. In `build-info`, also create a new file called `solc-input.json`.
 9. From `example.json`, copy the solc input data, which is everything in the curly brackets after `"input":`. Your text editor may have a way to collapse everything between the brackets so that you only have to copy `{...}`. Also note that you need to copy the curly brackets themselves, not just the stuff in between.
 10. Paste the solc input data into `solc-input.json`.
