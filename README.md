@@ -6,7 +6,7 @@ For more information on the LSP, [read the docs](https://umaproject.org/lsp.html
 
 ## Install system dependencies
 
-You will need to install nodejs (we recommend the latest stable version, nodejs v14, and nvm to manage node versions) and yarn.
+You will need to install nodejs v12 and yarn.
 
 Note: these additional dependencies are required -- you may or may not have them on your system already:
 
@@ -25,47 +25,39 @@ sudo apt-get update && sudo apt-get install -y libudev-dev libusb-1.0-0-dev
 yarn
 ```
 
-## Run the deployment script on a mainnet fork
-
-It's a good idea to try out your deployment on a fork before running it on mainnet. This will allow you to run the deployment in a forked environment and interact with it to ensure it works as expected. To do this, you will use [Ganache](https://www.trufflesuite.com/ganache), a tool that allows for the creation of local Ethereum test networks.
-
-You should replace `YOUR_NODE_URL` with the URL of whatever Kovan or mainnet Ethereum node that you wish to use. [Infura](https://infura.io/product/ethereum) provides easy access to Ethereum and is one method that you could use to get your node URL.
-
-Start ganache.
+## Run the deployment script on kovan
 
 ```bash
-yarn ganache-fork YOUR_NODE_URL
-```
-
-In a separate terminal, run the deployment script (it defaults to using localhost:8545 as the ETH node, which is
-desired in this case). Note: mnemonic is optional here; without it, ganache will use its default pre-loaded account.
-
-You will need to specify the creator address and financial product library addresses as parameters. In a future release, the creator address will be set automatically based on the chain ID (Mainnet, Kovan, Mumbai, etc.). For now, see the [deployed addresses](#deployed-address-reference) section of the README.
-
-```bash
-node index.js --gasprice 50 --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x81b0A8206C559a0747D86B4489D0055db4720E84 --gasprice 50 --expirationTimestamp 1643678287 --collateralPerPair 1000000000000000000 --priceIdentifier USDETH --collateralToken 0xd0a1e359811322d97991e03f863a0c30c2cf029c --syntheticName "ETH 9000 USD Call [December 2021]" --syntheticSymbol ETHc9000-1221 --financialProductLibrary 0x2CcA11DbbDC3E028D6c293eA5d386eE887071C59
-```
-
-Now you should be able to use `localhost:8545` to interact with a forked version of mainnet (or kovan) where your
-contract is deployed.
-
-## Run the deployment script on mainnet or kovan
-
-```bash
-node index.js --gasprice 50 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x81b0A8206C559a0747D86B4489D0055db4720E84 --gasprice 50 --expirationTimestamp 1643678287 --collateralPerPair 1000000000000000000 --priceIdentifier USDETH --collateralToken 0xd0a1e359811322d97991e03f863a0c30c2cf029c --syntheticName "ETH 9000 USD Call [December 2021]" --syntheticSymbol ETHc9000-1221 --financialProductLibrary 0x2CcA11DbbDC3E028D6c293eA5d386eE887071C59
+node index.js --gasprice 50 --url YOUR_KOVAN_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x81b0A8206C559a0747D86B4489D0055db4720E84 --expirationTimestamp 1643678287 --collateralPerPair 1000000000000000000 --priceIdentifier USDETH --collateralToken 0xd0a1e359811322d97991e03f863a0c30c2cf029c --syntheticName "ETH 9000 USD Call [December 2021]" --syntheticSymbol ETHc9000-1221 --financialProductLibrary 0x2CcA11DbbDC3E028D6c293eA5d386eE887071C59
 ```
 
 ## Customize your deployment parameters
 
-It is recommended to keep the default `lspParams` struct and only customize your construction parameters by passing in the listed mandatory args. See [the script](./index.js) or [documentation](https://docs.umaproject.org/synthetic-tokens/long-short-pair#lsp-construction-parameters) for more details.
+You can customize all of the deployment parameters of the LSP simply by changing the parameters that you pass in the run command above. See [the script](./index.js) or [documentation](https://docs.umaproject.org/synthetic-tokens/long-short-pair#lsp-construction-parameters) for more details about these parameters.
 
-## Deploying financial product libraries
+Your financial product library address will defines the payout function for your LSP. We have several [financial product libraries](https://github.com/UMAprotocol/protocol/tree/master/packages/core/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries) available for transforming the price, identifier, or collateral requirement of an LSP before or after expiry. For these addresses, see the `Contract Addresses` section. In some cases, you may find yourself in need of a custom financial product library for your use case. If so, please see the `Deploying new financial product libraries`.
 
-You must specify a financial product library address that defines the payout function for your LSP.
+## Contract Addresses
 
-We have several [financial product libraries](https://github.com/UMAprotocol/protocol/tree/master/packages/core/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries) available for transforming the price, identifier, or collateral requirement of an LSP before or after expiry. However, you may find yourself in need of a custom financial product library for your use case.
+These are the deployed addresses for the `LongShortPairCreator` and financial product library contracts on various networks. You can pass these as parameters when deploying.
 
-If so, fork the [protocol repo](https://github.com/UMAprotocol/protocol) and add your `CustomFinancialProductLibrary` Solidity file to [/packages/core/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries](https://github.com/UMAprotocol/protocol/tree/master/packages/core/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries). You will probably want a different name for your library, but this is an example!
+### Kovan
+LongShortPairCreator: 0x81b0A8206C559a0747D86B4489D0055db4720E84
+BinaryOptionLongShortPairFinancialProductLibrary: 0xB1d60d41246B6d679cF89A1e57c46B1387538009
+CoveredCallLongShortPairFinancialProductLibrary: 0x2CcA11DbbDC3E028D6c293eA5d386eE887071C59
+LinearLongShortPairFinancialProductLibrary: 0x46b541E0fE2E817340A1A88740607329fF5ED279
+RangeBondLongShortPairFinancialProductLibrary: 0xb8f4f21c9d276fddcece80e7a3e4c5d9f6addd63
+
+### Mumbai
+LongShortPairCreator: 0x6883FeB1c131F58C1Cd629289Da3dE0051d2aa0d
+BinaryOptionLongShortPairFinancialProductLibrary: 0x2158C256b2d9B2b58D90D3ddA1b6a90d64498F7d
+CoveredCallLongShortPairFinancialProductLibrary: 0xc19B7EF43a6eBd393446F401d1eCFac01B181ac0
+LinearLongShortPairFinancialProductLibrary: 0x2aBf1Bd76655de80eDB3086114315Eec75AF500c
+RangeBondLongShortPairFinancialProductLibrary: 0xb53A60f595EE2418be9F6057121EE77f0249AC28
+
+## Deploying new financial product libraries
+
+If you wish to deploy your own financial product library, fork the [protocol repo](https://github.com/UMAprotocol/protocol) and add your `CustomFinancialProductLibrary` Solidity file to [/packages/core/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries](https://github.com/UMAprotocol/protocol/tree/master/packages/core/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries). You will probably want a different name for your library, but this is an example!
 
 Then take the following steps to deploy and verify the contract. Sorry that it's a bit complicated! We're working on a simpler workflow, probably using Hardhat deployment.
 
@@ -83,21 +75,3 @@ Then take the following steps to deploy and verify the contract. Sorry that it's
 12. Click `Choose File` and choose your `solc-input.json` file in `build-info`. Then click the button that says `Click to Upload selected file`,
 13. Complete the captcha and click `Verify and Publish`.
 14. After some processing, Etherscan should verify your contract! This will allow you to read and write to the contract directly in Etherscan, in addition to seeing the source code.
-
-## Deployed addresses
-
-These are the deployed addresses for the `LongShortPairCreator` and financial product library contracts on various networks. You can pass these as parameters when deploying.
-
-### Kovan
-LongShortPairCreator: 0x81b0A8206C559a0747D86B4489D0055db4720E84
-BinaryOptionLongShortPairFinancialProductLibrary: 0xB1d60d41246B6d679cF89A1e57c46B1387538009
-CoveredCallLongShortPairFinancialProductLibrary: 0x2CcA11DbbDC3E028D6c293eA5d386eE887071C59
-LinearLongShortPairFinancialProductLibrary: 0x46b541E0fE2E817340A1A88740607329fF5ED279
-RangeBondLongShortPairFinancialProductLibrary: 0xb8f4f21c9d276fddcece80e7a3e4c5d9f6addd63
-
-### Mumbai
-LongShortPairCreator: 0x6883FeB1c131F58C1Cd629289Da3dE0051d2aa0d
-BinaryOptionLongShortPairFinancialProductLibrary: 0x2158C256b2d9B2b58D90D3ddA1b6a90d64498F7d
-CoveredCallLongShortPairFinancialProductLibrary: 0xc19B7EF43a6eBd393446F401d1eCFac01B181ac0
-LinearLongShortPairFinancialProductLibrary: 0x2aBf1Bd76655de80eDB3086114315Eec75AF500c
-RangeBondLongShortPairFinancialProductLibrary: 0xb53A60f595EE2418be9F6057121EE77f0249AC28
