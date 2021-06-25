@@ -89,7 +89,7 @@ const proposerReward = argv.prepaidProposerReward ? argv.prepaidProposerReward :
 
   const lspCreator = new web3.eth.Contract(
     getAbi("LongShortPairCreator"),
-    "0x81b0A8206C559a0747D86B4489D0055db4720E84"
+    argv.lspCreatorAddress
   );
 
   console.log("network id:", networkId);
