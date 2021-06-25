@@ -30,7 +30,6 @@ if (!argv.gasprice) throw "--gasprice required (in GWEI)";
 // if (typeof argv.gasprice !== "number") throw "--gasprice must be a number";
 if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between 1 and 1000 (GWEI)";
 
-if (!argv.lspCreatorAddress) throw "--lspCreatorAddress requred";
 if (!argv.expirationTimestamp) throw "--expirationTimestamp required";
 if (!argv.collateralPerPair) throw "--collateralPerPair required";
 if (!argv.priceIdentifier) throw "--priceIdentifier required";
@@ -39,6 +38,7 @@ if (!argv.syntheticName) throw "--syntheticName required";
 if (!argv.syntheticSymbol) throw "--syntheticSymbol required";
 if (!argv.financialProductLibrary) throw "--financialProductLibrary required";
 
+const lspCreatorAddress = argv.lspCreatorAddress ? argv.lspCreatorAddress : "0x81b0A8206C559a0747D86B4489D0055db4720E84"; // Kovan address
 const ancillaryData = argv.customAncillaryData ? argv.customAncillaryData : "";
 const proposerReward = argv.prepaidProposerReward ? argv.prepaidProposerReward : 0;
 
@@ -90,7 +90,7 @@ const proposerReward = argv.prepaidProposerReward ? argv.prepaidProposerReward :
 
   const lspCreator = new web3.eth.Contract(
     getAbi("LongShortPairCreator"),
-    argv.lspCreatorAddress
+    lspCreatorAddress
   );
 
   console.log("network id:", networkId);
