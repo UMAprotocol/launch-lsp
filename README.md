@@ -4,6 +4,8 @@ The purpose of this repository/package is to make it easy to customize your LSP 
 
 For more information on the LSP, [read the docs](https://umaproject.org/lsp.html).
 
+This launch repo currently is only for Kovan and Mumbai testnet LSP deployments. This will soon be updated to include Ethereum mainnet and Polygon deployments.
+
 ## Install system dependencies
 
 You will need to install nodejs v12 and yarn.
@@ -28,7 +30,7 @@ yarn
 ## Run the deployment script on kovan
 
 ```bash
-node index.js --gasprice 50 --url YOUR_KOVAN_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x81b0A8206C559a0747D86B4489D0055db4720E84 --expirationTimestamp 1643678287 --collateralPerPair 1000000000000000000 --priceIdentifier USDETH --collateralToken 0xd0a1e359811322d97991e03f863a0c30c2cf029c --syntheticName "ETH 9000 USD Call [December 2021]" --syntheticSymbol ETHc9000-1221 --financialProductLibrary 0x2CcA11DbbDC3E028D6c293eA5d386eE887071C59
+node index.js --gasprice 20 --url YOUR_KOVAN_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x81b0A8206C559a0747D86B4489D0055db4720E84 --expirationTimestamp 1643678287 --collateralPerPair 1000000000000000000 --priceIdentifier ETHUSD --collateralToken 0xd0a1e359811322d97991e03f863a0c30c2cf029c --syntheticName "ETH 9000 USD Call [December 2021]" --syntheticSymbol ETHc9000-1221 --financialProductLibrary 0x2CcA11DbbDC3E028D6c293eA5d386eE887071C59
 ```
 
 ## Customize your deployment parameters
