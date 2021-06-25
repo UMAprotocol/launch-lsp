@@ -17,22 +17,27 @@ const { parseFixed } = require("@ethersproject/bignumber");
 // --financialProductLibrary: Contract providing settlement payout logic.
 // --ancillaryData: Custom ancillary data to be passed along with the price request. If not needed, this should be left as a 0-length bytes array.
 // --proposerReward: Proposal reward to be forwarded to the created contract to be used to incentivize price proposals.
+//
+// Example deployment script:
+// node index.js --url "your node url" --mnemonic "your mnemonic" --gasprice 50 --expirationTimestamp 1643678287 --collateralPerPair 1000000000000000000 --priceIdentifier USDETH --collateralToken 0xd0a1e359811322d97991e03f863a0c30c2cf029c --syntheticName "ETH 9000 USD Call [December 2021]" --syntheticSymbol ETHc9000-1221
 
 const argv = require("minimist")(process.argv.slice(), {
-  string: ["url", "mnemonic", "expirationTimestamp", "collateralPerPair", "priceIdentifier", "collateralToken", "syntheticName", "syntheticSymbol", "financialProductLibrary"]
+  string: ["url", "mnemonic", "expirationTimestamp", "collateralPerPair", "priceIdentifier", "collateralToken", "syntheticName", "syntheticSymbol", "financialProductLibrary", "customAncillaryData", "prepaidProposerReward", "gasprice"]
 });
+
+if (!argv.gasprice) throw "--gasprice required (in GWEI)";
+// if (typeof argv.gasprice !== "number") throw "--gasprice must be a number";
+if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between 1 and 1000 (GWEI)";
+
 if (!argv.expirationTimestamp) throw "--expirationTimestamp required";
 if (!argv.collateralPerPair) throw "--collateralPerPair required";
 if (!argv.priceIdentifier) throw "--priceIdentifier required";
 if (!argv.collateralToken) throw "--collateralToken required";
 if (!argv.syntheticName) throw "--syntheticName required";
 if (!argv.syntheticSymbol) throw "--syntheticSymbol required";
-if (!argv.gasprice) throw "--gasprice required (in GWEI)";
-if (typeof argv.gasprice !== "number") throw "--gasprice must be a number";
-if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between 1 and 1000 (GWEI)";
 const financialProductLibraryAddress = argv.financialProductLibrary ? argv.financialProductLibrary : "0x0000000000000000000000000000000000000000";
-const customAncillaryData = argv.ancillaryData ? argv.ancillaryData : [];
-const prepaidProposerReward = argv.proposerReward ? argv.proposerReward : 0;
+const ancillaryData = argv.customAncillaryData ? argv.customAncillaryData : "";
+const proposerReward = argv.prepaidProposerReward ? argv.prepaidProposerReward : 0;
 
 // Wrap everything in an async function to allow the use of async/await.
 (async () => {
@@ -65,26 +70,28 @@ const prepaidProposerReward = argv.proposerReward ? argv.proposerReward : 0;
   const decimals = (await collateral.methods.decimals().call()).toString();
 
 
-  // EMP Parameters. Pass in arguments to customize these.
+  // LSP parameters. Pass in arguments to customize these.
   const lspParams = {
-    expirationTimestamp: argv.expirationTimestamp.toString(), // Timestamp that the contract will expire at.
-    collateralToken: argv.collateralToken.toString(), // Collateral token address.
+    expirationTimestamp: argv.expirationTimestamp, // Timestamp that the contract will expire at.
+    collateralPerPair: argv.collateralPerPair,
     priceIdentifier: padRight(utf8ToHex(argv.priceIdentifier.toString()), 64), // Price identifier to use.
     syntheticName: argv.syntheticName, // Long name.
     syntheticSymbol: argv.syntheticSymbol, // Short name.
-    collateralRequirement: { rawValue: toWei("1.25") }, // 125% collateral req.
-    disputeBondPercentage: { rawValue: toWei("0.1") }, // 10% dispute bond.
-    sponsorDisputeRewardPercentage: { rawValue: toWei("0.05") }, // 5% reward for sponsors who are disputed invalidly
-    disputerDisputeRewardPercentage: { rawValue: toWei("0.2") }, // 20% reward for correct disputes.
-    liquidationLiveness: 7200, // 2 hour liquidation liveness.
-    withdrawalLiveness: 7200, // 2 hour withdrawal liveness.
+    collateralToken: argv.collateralToken.toString(), // Collateral token address.
     financialProductLibrary: financialProductLibraryAddress, // Default to 0x0 if no address is passed.
+    customAncillaryData: utf8ToHex(ancillaryData), // Default to empty bytes array if no ancillary data is passed.
+    prepaidProposerReward: proposerReward // Default to 0 if no prepaid proposer reward is passed.
   };
 
-  const empCreator = new web3.eth.Contract(
+  console.log("params:", lspParams);
+
+  const lspCreator = new web3.eth.Contract(
     getAbi("LongShortPairCreator"),
     getAddress("LongShortPairCreator", networkId)
   );
+
+  console.log("network id:", networkId);
+  console.log("address:", getAddress("LongShortPairCreator", networkId));
 
   // Transaction parameters
   const transactionOptions = {
@@ -95,11 +102,11 @@ const prepaidProposerReward = argv.proposerReward ? argv.proposerReward : 0;
 
   // Simulate transaction to test before sending to the network.
   console.log("Simulating Deployment...");
-  const address = await empCreator.methods.createLongShortPair(lspParams).call(transactionOptions);
+  const address = await lspCreator.methods.createLongShortPair(...Object.values(lspParams)).call(transactionOptions);
   console.log("Simulation successful. Expected Address:", address);
 
   // Since the simulated transaction succeeded, send the real one to the network.
-  const { transactionHash } = await empCreator.methods.createLongShortPair(lspParams).send(transactionOptions);
+  const { transactionHash } = await lspCreator.methods.createLongShortPair(lspParams).send(transactionOptions);
   console.log("Deployed in transaction:", transactionHash);
   process.exit(0);
 })().catch((e) => {
