@@ -19,7 +19,7 @@ const { parseFixed } = require("@ethersproject/bignumber");
 // --proposerReward: Proposal reward to be forwarded to the created contract to be used to incentivize price proposals.
 //
 // Example deployment script:
-// node index.js --url "your node url" --mnemonic "your mnemonic" --gasprice 50 --expirationTimestamp 1643678287 --collateralPerPair 1000000000000000000 --priceIdentifier USDETH --collateralToken 0xd0a1e359811322d97991e03f863a0c30c2cf029c --syntheticName "ETH 9000 USD Call [December 2021]" --syntheticSymbol ETHc9000-1221
+// node index.js --url "your node url" --mnemonic "your mnemonic" --gasprice 50 --expirationTimestamp 1643678287 --collateralPerPair 1000000000000000000 --priceIdentifier USDETH --collateralToken 0xd0a1e359811322d97991e03f863a0c30c2cf029c --syntheticName "ETH 9000 USD Call [December 2021]" --syntheticSymbol ETHc9000-1221 --financialProductLibrary "0x2CcA11DbbDC3E028D6c293eA5d386eE887071C59"
 
 const argv = require("minimist")(process.argv.slice(), {
   string: ["url", "mnemonic", "expirationTimestamp", "collateralPerPair", "priceIdentifier", "collateralToken", "syntheticName", "syntheticSymbol", "financialProductLibrary", "customAncillaryData", "prepaidProposerReward", "gasprice"]
@@ -87,11 +87,10 @@ const proposerReward = argv.prepaidProposerReward ? argv.prepaidProposerReward :
 
   const lspCreator = new web3.eth.Contract(
     getAbi("LongShortPairCreator"),
-    getAddress("LongShortPairCreator", networkId)
+    "0x81b0A8206C559a0747D86B4489D0055db4720E84"
   );
 
   console.log("network id:", networkId);
-  console.log("address:", getAddress("LongShortPairCreator", networkId));
 
   // Transaction parameters
   const transactionOptions = {
@@ -106,7 +105,7 @@ const proposerReward = argv.prepaidProposerReward ? argv.prepaidProposerReward :
   console.log("Simulation successful. Expected Address:", address);
 
   // Since the simulated transaction succeeded, send the real one to the network.
-  const { transactionHash } = await lspCreator.methods.createLongShortPair(lspParams).send(transactionOptions);
+  const { transactionHash } = await lspCreator.methods.createLongShortPair(...Object.values(lspParams)).send(transactionOptions);
   console.log("Deployed in transaction:", transactionHash);
   process.exit(0);
 })().catch((e) => {
