@@ -37,6 +37,8 @@ You can customize all of the deployment parameters of the LSP simply by changing
 
 Your financial product library address will defines the payout function for your LSP. We have several [financial product libraries](https://github.com/UMAprotocol/protocol/tree/master/packages/core/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries) available for transforming the price, identifier, or collateral requirement of an LSP before or after expiry. For these addresses, see the `Contract Addresses` section. In some cases, you may find yourself in need of a custom financial product library for your use case. If so, please see the `Deploying new financial product libraries`.
 
+Note that the `LongShortPairCreator` contract will differentiate between long and short tokens by appending " Long Token" or " Short Token" to `syntheticName` and prepending "l" or "s" to the `syntheticSymbol`.
+
 ## Contract Addresses
 
 These are the deployed addresses for the `LongShortPairCreator` and financial product library contracts on various networks. You can pass these as parameters when deploying.
