@@ -7,7 +7,8 @@ const { parseFixed } = require("@ethersproject/bignumber");
 // --url: node url, by default points at http://localhost:8545.
 // --mnemonic: an account mnemonic you'd like to use. The script will default to using the node's unlocked accounts.
 // Mandatory arguments:
-// --gasprice: gas price to use in GWEI
+// --lspCreatorAddress: deployed address of the creator contract you're calling. This will be set based on chain ID in future releases.
+// --gasprice: gas price to use in GWEI.
 // --expirationTimestamp: timestamp that the contract will expire at.
 // --collateralPerPair: how many units of collateral are required to mint one pair of synthetic tokens.
 // --priceIdentifier: price identifier to use.
@@ -19,16 +20,17 @@ const { parseFixed } = require("@ethersproject/bignumber");
 // --proposerReward: Proposal reward to be forwarded to the created contract to be used to incentivize price proposals.
 //
 // Example deployment script:
-// node index.js --url "your node url" --mnemonic "your mnemonic" --gasprice 50 --expirationTimestamp 1643678287 --collateralPerPair 1000000000000000000 --priceIdentifier USDETH --collateralToken 0xd0a1e359811322d97991e03f863a0c30c2cf029c --syntheticName "ETH 9000 USD Call [December 2021]" --syntheticSymbol ETHc9000-1221 --financialProductLibrary "0x2CcA11DbbDC3E028D6c293eA5d386eE887071C59"
+// node index.js --url "your node url" --mnemonic "your mnemonic" --lspCreatorAddress 0x81b0A8206C559a0747D86B4489D0055db4720E84 --gasprice 50 --expirationTimestamp 1643678287 --collateralPerPair 1000000000000000000 --priceIdentifier USDETH --collateralToken 0xd0a1e359811322d97991e03f863a0c30c2cf029c --syntheticName "ETH 9000 USD Call [December 2021]" --syntheticSymbol ETHc9000-1221 --financialProductLibrary "0x2CcA11DbbDC3E028D6c293eA5d386eE887071C59"
 
 const argv = require("minimist")(process.argv.slice(), {
-  string: ["url", "mnemonic", "expirationTimestamp", "collateralPerPair", "priceIdentifier", "collateralToken", "syntheticName", "syntheticSymbol", "financialProductLibrary", "customAncillaryData", "prepaidProposerReward", "gasprice"]
+  string: ["url", "mnemonic", "lspCreatorAddress", "expirationTimestamp", "collateralPerPair", "priceIdentifier", "collateralToken", "syntheticName", "syntheticSymbol", "financialProductLibrary", "customAncillaryData", "prepaidProposerReward", "gasprice"]
 });
 
 if (!argv.gasprice) throw "--gasprice required (in GWEI)";
 // if (typeof argv.gasprice !== "number") throw "--gasprice must be a number";
 if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between 1 and 1000 (GWEI)";
 
+if (!argv.lspCreatorAddress) throw "--lspCreatorAddress requred";
 if (!argv.expirationTimestamp) throw "--expirationTimestamp required";
 if (!argv.collateralPerPair) throw "--collateralPerPair required";
 if (!argv.priceIdentifier) throw "--priceIdentifier required";
