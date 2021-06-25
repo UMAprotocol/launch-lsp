@@ -3,31 +3,36 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 const { getAbi, getAddress } = require("@uma/core");
 const { parseFixed } = require("@ethersproject/bignumber");
 
-// Optional arguments:
+// Arguments:
 // --url: node url, by default points at http://localhost:8545.
 // --mnemonic: an account mnemonic you'd like to use. The script will default to using the node's unlocked accounts.
 // Mandatory arguments:
 // --gasprice: gas price to use in GWEI
-// --priceFeedIdentifier: price identifier to use.
-// --collateralAddress: collateral token address.
 // --expirationTimestamp: timestamp that the contract will expire at.
+// --collateralPerPair: how many units of collateral are required to mint one pair of synthetic tokens.
+// --priceIdentifier: price identifier to use.
 // --syntheticName: long name.
 // --syntheticSymbol: short name.
-// --minSponsorTokens: minimum sponsor position size
+// --collateralToken: ERC20 token used as as collateral in the LSP.
+// --financialProductLibrary: Contract providing settlement payout logic.
+// --ancillaryData: Custom ancillary data to be passed along with the price request. If not needed, this should be left as a 0-length bytes array.
+// --proposerReward: Proposal reward to be forwarded to the created contract to be used to incentivize price proposals.
 
 const argv = require("minimist")(process.argv.slice(), {
-  string: ["url", "mnemonic", "priceFeedIdentifier", "collateralAddress", "expirationTimestamp", "syntheticName", "syntheticSymbol", "minSponsorTokens", "libraryAddress"]
+  string: ["url", "mnemonic", "expirationTimestamp", "collateralPerPair", "priceIdentifier", "collateralToken", "syntheticName", "syntheticSymbol", "financialProductLibrary"]
 });
-if (!argv.priceFeedIdentifier) throw "--priceFeedIdentifier required";
-if (!argv.collateralAddress) throw "--collateralAddress required";
 if (!argv.expirationTimestamp) throw "--expirationTimestamp required";
+if (!argv.collateralPerPair) throw "--collateralPerPair required";
+if (!argv.priceIdentifier) throw "--priceIdentifier required";
+if (!argv.collateralToken) throw "--collateralToken required";
 if (!argv.syntheticName) throw "--syntheticName required";
 if (!argv.syntheticSymbol) throw "--syntheticSymbol required";
-if (!argv.minSponsorTokens) throw "--minSponsorTokens required";
 if (!argv.gasprice) throw "--gasprice required (in GWEI)";
 if (typeof argv.gasprice !== "number") throw "--gasprice must be a number";
 if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between 1 and 1000 (GWEI)";
-const libraryAddress = argv.libraryAddress ? argv.libraryAddress : "0x0000000000000000000000000000000000000000";
+const financialProductLibraryAddress = argv.financialProductLibrary ? argv.financialProductLibrary : "0x0000000000000000000000000000000000000000";
+const customAncillaryData = argv.ancillaryData ? argv.ancillaryData : [];
+const prepaidProposerReward = argv.proposerReward ? argv.proposerReward : 0;
 
 // Wrap everything in an async function to allow the use of async/await.
 (async () => {
@@ -55,31 +60,30 @@ const libraryAddress = argv.libraryAddress ? argv.libraryAddress : "0x0000000000
   // Grab collateral decimals.
   const collateral = new web3.eth.Contract(
     getAbi("IERC20Standard"),
-    argv.collateralAddress
+    argv.collateralToken
   );
   const decimals = (await collateral.methods.decimals().call()).toString();
 
 
   // EMP Parameters. Pass in arguments to customize these.
-  const empParams = {
+  const lspParams = {
     expirationTimestamp: argv.expirationTimestamp.toString(), // Timestamp that the contract will expire at.
-    collateralAddress: argv.collateralAddress.toString(), // Collateral token address.
-    priceFeedIdentifier: padRight(utf8ToHex(argv.priceFeedIdentifier.toString()), 64), // Price identifier to use.
+    collateralToken: argv.collateralToken.toString(), // Collateral token address.
+    priceIdentifier: padRight(utf8ToHex(argv.priceIdentifier.toString()), 64), // Price identifier to use.
     syntheticName: argv.syntheticName, // Long name.
     syntheticSymbol: argv.syntheticSymbol, // Short name.
     collateralRequirement: { rawValue: toWei("1.25") }, // 125% collateral req.
     disputeBondPercentage: { rawValue: toWei("0.1") }, // 10% dispute bond.
     sponsorDisputeRewardPercentage: { rawValue: toWei("0.05") }, // 5% reward for sponsors who are disputed invalidly
     disputerDisputeRewardPercentage: { rawValue: toWei("0.2") }, // 20% reward for correct disputes.
-    minSponsorTokens: { rawValue: parseFixed(argv.minSponsorTokens.toString(), decimals) }, // Minimum sponsor position size.
     liquidationLiveness: 7200, // 2 hour liquidation liveness.
     withdrawalLiveness: 7200, // 2 hour withdrawal liveness.
-    financialProductLibraryAddress: libraryAddress, // Default to 0x0 if no address is passed.
+    financialProductLibrary: financialProductLibraryAddress, // Default to 0x0 if no address is passed.
   };
 
   const empCreator = new web3.eth.Contract(
-    getAbi("ExpiringMultiPartyCreator"),
-    getAddress("ExpiringMultiPartyCreator", networkId)
+    getAbi("LongShortPairCreator"),
+    getAddress("LongShortPairCreator", networkId)
   );
 
   // Transaction parameters
@@ -91,11 +95,11 @@ const libraryAddress = argv.libraryAddress ? argv.libraryAddress : "0x0000000000
 
   // Simulate transaction to test before sending to the network.
   console.log("Simulating Deployment...");
-  const address = await empCreator.methods.createExpiringMultiParty(empParams).call(transactionOptions);
+  const address = await empCreator.methods.createLongShortPair(lspParams).call(transactionOptions);
   console.log("Simulation successful. Expected Address:", address);
 
   // Since the simulated transaction succeeded, send the real one to the network.
-  const { transactionHash } = await empCreator.methods.createExpiringMultiParty(empParams).send(transactionOptions);
+  const { transactionHash } = await empCreator.methods.createLongShortPair(lspParams).send(transactionOptions);
   console.log("Deployed in transaction:", transactionHash);
   process.exit(0);
 })().catch((e) => {
