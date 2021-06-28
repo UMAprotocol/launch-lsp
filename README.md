@@ -43,35 +43,15 @@ Note that the `LongShortPairCreator` contract will differentiate between long an
 
 ## Contract Addresses
 
-These are the deployed addresses for the `LongShortPairCreator` and financial product library contracts on various networks. You can pass these as parameters when deploying.
+See the files linked below for the `LongShortPairCreator` and financial product library contract addresses on various networks. You can pass these as parameters when deploying.
 
-### Ethereum Mainnet
-LongShortPairCreator: 0x07417ca264170fc5bd3568f93cfb956729752b61
-BinaryOptionLongShortPairFinancialProductLibrary: 0x072819Bb43B50E7A251c64411e7aA362ce82803B
-CoveredCallLongShortPairFinancialProductLibrary: 0x37780b718c19F7f06D41f3c68C3A78ECB2Ca191f
-LinearLongShortPairFinancialProductLibrary: 0x488211B646b909C490d942f456481BeAE52fde27
-RangeBondLongShortPairFinancialProductLibrary: 0x9214454Ff30410a1558b8749Ab3FB0fD6F942539
+[Ethereum Mainnet](https://github.com/UMAprotocol/protocol/blob/master/packages/core/networks/1.json)
 
-### Polygon Mainnet
-LongShortPairCreator: 0x3e665D15425fAee14eEF53B9caaa0762b243911a
-BinaryOptionLongShortPairFinancialProductLibrary: 0xda768D869f1e89ea005cde7e1dBf630ff9307F33
-CoveredCallLongShortPairFinancialProductLibrary: 0x3F62D7F4Be7671cc93BCDFE7A3Dd900FEC4b5025
-LinearLongShortPairFinancialProductLibrary: 0xcFF28e9E83cEc1BCa8D8619dC7eA60244b433502
-RangeBondLongShortPairFinancialProductLibrary: 0x7A9Bbd278b40f90F1269cB3a9D94a63333febdD4
+[Polygon Mainnet](https://github.com/UMAprotocol/protocol/blob/master/packages/core/networks/137.json)
 
-### Kovan
-LongShortPairCreator: 0x81b0A8206C559a0747D86B4489D0055db4720E84
-BinaryOptionLongShortPairFinancialProductLibrary: 0xB1d60d41246B6d679cF89A1e57c46B1387538009
-CoveredCallLongShortPairFinancialProductLibrary: 0x2CcA11DbbDC3E028D6c293eA5d386eE887071C59
-LinearLongShortPairFinancialProductLibrary: 0x46b541E0fE2E817340A1A88740607329fF5ED279
-RangeBondLongShortPairFinancialProductLibrary: 0xb8f4f21c9d276fddcece80e7a3e4c5d9f6addd63
+[Kovan](https://github.com/UMAprotocol/protocol/blob/master/packages/core/networks/42.json)
 
-### Mumbai
-LongShortPairCreator: 0x6883FeB1c131F58C1Cd629289Da3dE0051d2aa0d
-BinaryOptionLongShortPairFinancialProductLibrary: 0x2158C256b2d9B2b58D90D3ddA1b6a90d64498F7d
-CoveredCallLongShortPairFinancialProductLibrary: 0xc19B7EF43a6eBd393446F401d1eCFac01B181ac0
-LinearLongShortPairFinancialProductLibrary: 0x2aBf1Bd76655de80eDB3086114315Eec75AF500c
-RangeBondLongShortPairFinancialProductLibrary: 0xb53A60f595EE2418be9F6057121EE77f0249AC28
+[Mumbai](https://github.com/UMAprotocol/protocol/blob/master/packages/core/networks/80001.json)
 
 ## Deploying new financial product libraries
 
