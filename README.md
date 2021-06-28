@@ -8,7 +8,7 @@ This launch repo currently is only for Kovan and Mumbai testnet LSP deployments.
 
 ## Install system dependencies
 
-You will need to install nodejs v12 and yarn.
+You will need to install nodejs v14 and yarn. If you are testing on local fork with ganache, you will need to use node v12. 
 
 Note: these additional dependencies are required -- you may or may not have them on your system already:
 
@@ -27,10 +27,12 @@ sudo apt-get update && sudo apt-get install -y libudev-dev libusb-1.0-0-dev
 yarn
 ```
 
-## Run the deployment script on kovan
+## Run the deployment script
+
+Before running this command, you should customize the parameters to your needs. `YOUR_NODE_URL` should be filled in with a url for the network that you wish to deploy to and the `lspCreatorAddress` value should be substituted with the creator address on that same network. These creator addresses can be found in the `Contract Addresses` section. It is prefilled with the Kovan `LongShortPairCreator` address.
 
 ```bash
-node index.js --gasprice 20 --url YOUR_KOVAN_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x81b0A8206C559a0747D86B4489D0055db4720E84 --expirationTimestamp 1643678287 --collateralPerPair 1000000000000000000 --priceIdentifier ETHUSD --collateralToken 0xd0a1e359811322d97991e03f863a0c30c2cf029c --syntheticName "ETH 9000 USD Call [December 2021]" --syntheticSymbol ETHc9000-1221 --financialProductLibrary 0x2CcA11DbbDC3E028D6c293eA5d386eE887071C59
+node index.js --gasprice 20 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x4C68829DBD07FEbB250B90f5624d4a5C30BBeC2c --expirationTimestamp 1643678287 --collateralPerPair 1000000000000000000 --priceIdentifier ETHUSD --collateralToken 0xd0a1e359811322d97991e03f863a0c30c2cf029c --syntheticName "ETH 9000 USD Call [December 2021]" --syntheticSymbol ETHc9000-1221 --financialProductLibrary 0x2CcA11DbbDC3E028D6c293eA5d386eE887071C59
 ```
 
 ## Customize your deployment parameters
