@@ -8,7 +8,7 @@ This launch repo currently is only for Kovan and Mumbai testnet LSP deployments.
 
 ## Install system dependencies
 
-You will need to install nodejs v14 and yarn. If you are testing on local fork with ganache, you will need to use node v12. 
+You will need to install nodejs v14 and yarn. If you are testing on local fork with ganache, you will need to use node v12.
 
 Note: these additional dependencies are required -- you may or may not have them on your system already:
 
@@ -29,10 +29,10 @@ yarn
 
 ## Run the deployment script
 
-Before running this command, you should customize the parameters to your needs. `YOUR_NODE_URL` should be filled in with a url for the network that you wish to deploy to and the `lspCreatorAddress` value should be substituted with the creator address on that same network. These creator addresses can be found in the `Contract Addresses` section. It is prefilled with the Kovan `LongShortPairCreator` address.
+Before running this command, you should customize the parameters to your needs. `YOUR_NODE_URL` should be filled in with a url for the network that you wish to deploy to and the `lspCreatorAddress` value should be substituted with the creator address on that same network. These creator addresses can be found in the `Contract Addresses` section. It is prefilled with the Ethereum mainnet `LongShortPairCreator` address.
 
 ```bash
-node index.js --gasprice 20 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x4C68829DBD07FEbB250B90f5624d4a5C30BBeC2c --expirationTimestamp 1643678287 --collateralPerPair 1000000000000000000 --priceIdentifier ETHUSD --collateralToken 0xd0a1e359811322d97991e03f863a0c30c2cf029c --syntheticName "ETH 9000 USD Call [December 2021]" --syntheticSymbol ETHc9000-1221 --financialProductLibrary 0x2CcA11DbbDC3E028D6c293eA5d386eE887071C59
+node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x0b8de441B26E36f461b2748919ed71f50593A67b --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA $4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA $4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x04fa0d235c4abf4bcf4787af4cf447de572ef828 --financialProductLibrary 0x9214454Ff30410a1558b8749Ab3FB0fD6F942539 --customAncillaryData "twapLength:3600"
 ```
 
 ## Customize your deployment parameters
