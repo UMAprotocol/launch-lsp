@@ -20,196 +20,7 @@ const { parseFixed } = require("@ethersproject/bignumber");
 // --proposerReward: Proposal reward to be forwarded to the created contract to be used to incentivize price proposals.
 //
 // Example deployment script:
-// node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x0b8de441B26E36f461b2748919ed71f50593A67b --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA $4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA $4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x04fa0d235c4abf4bcf4787af4cf447de572ef828 --financialProductLibrary 0x9214454Ff30410a1558b8749Ab3FB0fD6F942539 --customAncillaryData "twapLength:3600"
-
-const lspCreatorABI = [
-    {
-      "inputs": [
-        {
-          "internalType": "contract FinderInterface",
-          "name": "_finder",
-          "type": "address"
-        },
-        {
-          "internalType": "contract TokenFactory",
-          "name": "_tokenFactory",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_timer",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "longShortPair",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "deployerAddress",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "longToken",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "shortToken",
-          "type": "address"
-        }
-      ],
-      "name": "CreatedLongShortPair",
-      "type": "event"
-    },
-    {
-      "inputs": [],
-      "name": "finder",
-      "outputs": [
-        {
-          "internalType": "contract FinderInterface",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getCurrentTime",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "time",
-          "type": "uint256"
-        }
-      ],
-      "name": "setCurrentTime",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "timerAddress",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "tokenFactory",
-      "outputs": [
-        {
-          "internalType": "contract TokenFactory",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint64",
-          "name": "expirationTimestamp",
-          "type": "uint64"
-        },
-        {
-          "internalType": "uint256",
-          "name": "collateralPerPair",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "priceIdentifier",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "string",
-          "name": "longSynthName",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "longSynthSymbol",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "shortSynthName",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "shortSynthSymbol",
-          "type": "string"
-        },
-        {
-          "internalType": "contract IERC20Standard",
-          "name": "collateralToken",
-          "type": "address"
-        },
-        {
-          "internalType": "contract LongShortPairFinancialProductLibrary",
-          "name": "financialProductLibrary",
-          "type": "address"
-        },
-        {
-          "internalType": "bytes",
-          "name": "customAncillaryData",
-          "type": "bytes"
-        },
-        {
-          "internalType": "uint256",
-          "name": "prepaidProposerReward",
-          "type": "uint256"
-        }
-      ],
-      "name": "createLongShortPair",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    }
-  ];
+// node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x566f98ECadE3EF95a6c5840621C43F15f403274c --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA \$4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --financialProductLibrary 0xb8f4f21c9d276fddcece80e7a3e4c5d9f6addd63 --customAncillaryData "twapLength:3600"
 
 const argv = require("minimist")(process.argv.slice(), {
   string: ["url", "mnemonic", "lspCreatorAddress", "expirationTimestamp", "collateralPerPair", "priceIdentifier", "longSynthName", "longSynthSymbol", "shortSynthName", "shortSynthSymbol", "collateralToken", "financialProductLibrary", "customAncillaryData", "prepaidProposerReward", "gasprice"]
@@ -229,7 +40,6 @@ if (!argv.shortSynthSymbol) throw "--shortSynthSymbol required";
 if (!argv.collateralToken) throw "--collateralToken required";
 if (!argv.financialProductLibrary) throw "--financialProductLibrary required";
 
-const lspCreatorAddress = argv.lspCreatorAddress ? argv.lspCreatorAddress : "0x04fa0d235c4abf4bcf4787af4cf447de572ef828"; // Ethereum mainnet address
 const ancillaryData = argv.customAncillaryData ? argv.customAncillaryData : "";
 const proposerReward = argv.prepaidProposerReward ? argv.prepaidProposerReward : 0;
 
@@ -255,6 +65,7 @@ const proposerReward = argv.prepaidProposerReward ? argv.prepaidProposerReward :
     throw "No accounts. Must provide mnemonic or node must have unlocked accounts.";
   const account = accounts[0];
   const networkId = await web3.eth.net.getId();
+  console.log("network id:", networkId);
 
   // Grab collateral decimals.
   const collateral = new web3.eth.Contract(
@@ -266,6 +77,7 @@ const proposerReward = argv.prepaidProposerReward ? argv.prepaidProposerReward :
 
   // LSP parameters. Pass in arguments to customize these.
   const lspParams = {
+    pairName: argv.longSynthName,
     expirationTimestamp: argv.expirationTimestamp, // Timestamp that the contract will expire at.
     collateralPerPair: argv.collateralPerPair,
     priceIdentifier: padRight(utf8ToHex(argv.priceIdentifier.toString()), 64), // Price identifier to use.
@@ -276,33 +88,37 @@ const proposerReward = argv.prepaidProposerReward ? argv.prepaidProposerReward :
     collateralToken: argv.collateralToken.toString(), // Collateral token address.
     financialProductLibrary: argv.financialProductLibrary.toString(),
     customAncillaryData: utf8ToHex(ancillaryData), // Default to empty bytes array if no ancillary data is passed.
-    prepaidProposerReward: proposerReward // Default to 0 if no prepaid proposer reward is passed.
+    prepaidProposerReward: proposerReward, // Default to 0 if no prepaid proposer reward is passed.
+    optimisticOracleLivenessTime: 7200,
+    optimisticOracleProposerBond: 0
   };
 
   console.log("params:", lspParams);
 
+  const lspCreatorAddress = argv.lspCreatorAddress ? argv.lspCreatorAddress : await getAddress("LongShortPairCreator", networkId);
+  console.log("creator address:", lspCreatorAddress);
+
   const lspCreator = new web3.eth.Contract(
-    // getAbi("LongShortPairCreator"),
-    lspCreatorABI,
+    getAbi("LongShortPairCreator"),
     lspCreatorAddress
   );
-
-  console.log("network id:", networkId);
 
   // Transaction parameters
   const transactionOptions = {
     gas: 12000000, // 12MM is very high. Set this lower if you only have < 2 ETH or so in your wallet.
     gasPrice: argv.gasprice * 1000000000, // gasprice arg * 1 GWEI
-    from: account,
+    from: account
   };
+
+  console.log("transaction options:", transactionOptions);
 
   // Simulate transaction to test before sending to the network.
   console.log("Simulating Deployment...");
-  const address = await lspCreator.methods.createLongShortPair(...Object.values(lspParams)).call(transactionOptions);
+  const address = await lspCreator.methods.createLongShortPair(lspParams).call(transactionOptions);
   console.log("Simulation successful. Expected Address:", address);
 
   // Since the simulated transaction succeeded, send the real one to the network.
-  const { transactionHash } = await lspCreator.methods.createLongShortPair(...Object.values(lspParams)).send(transactionOptions);
+  const { transactionHash } = await lspCreator.methods.createLongShortPair(lspParams).send(transactionOptions);
   console.log("Deployed in transaction:", transactionHash);
   process.exit(0);
 })().catch((e) => {

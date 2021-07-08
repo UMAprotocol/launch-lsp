@@ -32,7 +32,7 @@ yarn
 Before running this command, you should customize the parameters to your needs. `YOUR_NODE_URL` should be filled in with a url for the network that you wish to deploy to and the `lspCreatorAddress` value should be substituted with the creator address on that same network. These creator addresses can be found in the `Contract Addresses` section. It is prefilled with the Ethereum mainnet `LongShortPairCreator` address.
 
 ```bash
-node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x0b8de441B26E36f461b2748919ed71f50593A67b --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA $4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA $4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x04fa0d235c4abf4bcf4787af4cf447de572ef828 --financialProductLibrary 0x9214454Ff30410a1558b8749Ab3FB0fD6F942539 --customAncillaryData "twapLength:3600"
+node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x566f98ECadE3EF95a6c5840621C43F15f403274c --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA \$4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --financialProductLibrary 0xb8f4f21c9d276fddcece80e7a3e4c5d9f6addd63 --customAncillaryData "twapLength:3600"
 ```
 
 ## Customize your deployment parameters
