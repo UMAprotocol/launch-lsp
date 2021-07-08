@@ -20,10 +20,10 @@ const { parseFixed } = require("@ethersproject/bignumber");
 // --proposerReward: Proposal reward to be forwarded to the created contract to be used to incentivize price proposals.
 //
 // Example deployment script:
-// node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x566f98ECadE3EF95a6c5840621C43F15f403274c --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA \$4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --financialProductLibrary 0xb8f4f21c9d276fddcece80e7a3e4c5d9f6addd63 --customAncillaryData "twapLength:3600"
+// node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x566f98ECadE3EF95a6c5840621C43F15f403274c --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA \$4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --financialProductLibraryAddress 0xb8f4f21c9d276fddcece80e7a3e4c5d9f6addd63 --customAncillaryData "twapLength:3600"
 
 const argv = require("minimist")(process.argv.slice(), {
-  string: ["url", "mnemonic", "lspCreatorAddress", "expirationTimestamp", "collateralPerPair", "priceIdentifier", "longSynthName", "longSynthSymbol", "shortSynthName", "shortSynthSymbol", "collateralToken", "financialProductLibrary", "customAncillaryData", "prepaidProposerReward", "gasprice"]
+  string: ["url", "mnemonic", "lspCreatorAddress", "expirationTimestamp", "collateralPerPair", "priceIdentifier", "longSynthName", "longSynthSymbol", "shortSynthName", "shortSynthSymbol", "collateralToken", "financialProductLibraryAddress", "customAncillaryData", "prepaidProposerReward", "gasprice"]
 });
 
 if (!argv.gasprice) throw "--gasprice required (in GWEI)";
@@ -38,7 +38,7 @@ if (!argv.longSynthSymbol) throw "--longSynthSymbol required";
 if (!argv.shortSynthName) throw "--shortSynthName required";
 if (!argv.shortSynthSymbol) throw "--shortSynthSymbol required";
 if (!argv.collateralToken) throw "--collateralToken required";
-if (!argv.financialProductLibrary) throw "--financialProductLibrary required";
+if (!argv.financialProductLibraryAddress) throw "--financialProductLibraryAddress required";
 
 const ancillaryData = argv.customAncillaryData ? argv.customAncillaryData : "";
 const proposerReward = argv.prepaidProposerReward ? argv.prepaidProposerReward : 0;
