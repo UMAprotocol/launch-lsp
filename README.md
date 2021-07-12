@@ -102,7 +102,13 @@ With this equation, the contract deployer does not need to specify the bond noti
 
 Specify this library with the flag `--fpl RangeBond`.
 
-TODO: Explain how to set library parameters on Etherscan.
+When deploying the Range Bond, you should set `collateralPerPair` to `R1/N`.
+
+For example, if the low price in the range is `$4` and the notional of the bond is `$1`, you should set `collateralPerPair` to `0.25` (`250000000000000000`, with 1e18 decimals).
+
+If the low price in the range is `$2` and the notional of the bond is `$100`, you should set `collateralPerPair` to `50` (`50000000000000000000`, with 1e18 decimals).
+
+After deploying the Range Bond, you must separately call `setLongShortPairParameters` on the library contract, which you can do on Etherscan or PolygonScan. Set `longShortPair` to your deployed Range Bond address, `highPriceRange` to your high price range (with 1e18 decimals), and `lowPriceRange` to your low price range (with 1e18 decimals).
 
 ### New Libraries
 
