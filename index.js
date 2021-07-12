@@ -87,7 +87,7 @@ const livenessTime = argv.optimisticOracleLivenessTime ? argv.optimisticOracleLi
   const proposerBond = argv.optimisticOracleProposerBond ? argv.optimisticOracleProposerBond : finalFee;
 
   // Set FPL.
-  const fpl = await getAddress(argv.fpl + "LongShortPairFinancialProductLibrary", networkId);
+  const fpl = argv.fpl ? await getAddress(argv.fpl + "LongShortPairFinancialProductLibrary", networkId) : '';
   console.log("fpl:", fpl);
   const financialProductLibrary = argv.financialProductLibraryAddress ? argv.financialProductLibraryAddress.toString() : fpl;
 
