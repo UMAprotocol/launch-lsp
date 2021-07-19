@@ -20,27 +20,30 @@ const { parseFixed } = require("@ethersproject/bignumber");
 // --proposerReward: Proposal reward to be forwarded to the created contract to be used to incentivize price proposals.
 //
 // Example deployment script:
-// node index.js --url "your node url" --mnemonic "your mnemonic" --lspCreatorAddress 0x81b0A8206C559a0747D86B4489D0055db4720E84 --gasprice 50 --expirationTimestamp 1643678287 --collateralPerPair 1000000000000000000 --priceIdentifier USDETH --collateralToken 0xd0a1e359811322d97991e03f863a0c30c2cf029c --syntheticName "ETH 9000 USD Call [December 2021]" --syntheticSymbol ETHc9000-1221 --financialProductLibrary "0x2CcA11DbbDC3E028D6c293eA5d386eE887071C59"
+// node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x566f98ECadE3EF95a6c5840621C43F15f403274c --pairName "UMA \$4-12 Range Token Pair August 2021" --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA \$4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --customAncillaryData "twapLength:3600" --optimisticOracleLivenessTime 3600 --fpl RangeBond
 
 const argv = require("minimist")(process.argv.slice(), {
-  string: ["url", "mnemonic", "lspCreatorAddress", "expirationTimestamp", "collateralPerPair", "priceIdentifier", "collateralToken", "syntheticName", "syntheticSymbol", "financialProductLibrary", "customAncillaryData", "prepaidProposerReward", "gasprice"]
+  string: ["url", "mnemonic", "lspCreatorAddress", "pairName", "expirationTimestamp", "collateralPerPair", "priceIdentifier", "longSynthName", "longSynthSymbol", "shortSynthName", "shortSynthSymbol", "collateralToken", "financialProductLibraryAddress", "fpl", "customAncillaryData", "prepaidProposerReward", "optimisticOracleLivenessTime", "optimisticOracleProposerBond", "gasprice"]
 });
 
 if (!argv.gasprice) throw "--gasprice required (in GWEI)";
 // if (typeof argv.gasprice !== "number") throw "--gasprice must be a number";
 if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between 1 and 1000 (GWEI)";
 
+if (!argv.pairName) throw "--pairName required";
 if (!argv.expirationTimestamp) throw "--expirationTimestamp required";
 if (!argv.collateralPerPair) throw "--collateralPerPair required";
 if (!argv.priceIdentifier) throw "--priceIdentifier required";
+if (!argv.longSynthName) throw "--longSynthName required";
+if (!argv.longSynthSymbol) throw "--longSynthSymbol required";
+if (!argv.shortSynthName) throw "--shortSynthName required";
+if (!argv.shortSynthSymbol) throw "--shortSynthSymbol required";
 if (!argv.collateralToken) throw "--collateralToken required";
-if (!argv.syntheticName) throw "--syntheticName required";
-if (!argv.syntheticSymbol) throw "--syntheticSymbol required";
-if (!argv.financialProductLibrary) throw "--financialProductLibrary required";
+if (!argv.financialProductLibraryAddress && !argv.fpl) throw "either --financialProductLibraryAddress or --fpl required";
 
-const lspCreatorAddress = argv.lspCreatorAddress ? argv.lspCreatorAddress : "0x81b0A8206C559a0747D86B4489D0055db4720E84"; // Kovan address
 const ancillaryData = argv.customAncillaryData ? argv.customAncillaryData : "";
 const proposerReward = argv.prepaidProposerReward ? argv.prepaidProposerReward : 0;
+const livenessTime = argv.optimisticOracleLivenessTime ? argv.optimisticOracleLivenessTime : 7200;
 
 // Wrap everything in an async function to allow the use of async/await.
 (async () => {
@@ -64,6 +67,7 @@ const proposerReward = argv.prepaidProposerReward ? argv.prepaidProposerReward :
     throw "No accounts. Must provide mnemonic or node must have unlocked accounts.";
   const account = accounts[0];
   const networkId = await web3.eth.net.getId();
+  console.log("network id:", networkId);
 
   // Grab collateral decimals.
   const collateral = new web3.eth.Contract(
@@ -72,43 +76,65 @@ const proposerReward = argv.prepaidProposerReward ? argv.prepaidProposerReward :
   );
   const decimals = (await collateral.methods.decimals().call()).toString();
 
+  // Get the final fee for the collateral type to use as default proposer bond.
+  const storeAddress = await getAddress("Store", networkId);
+  const store = new web3.eth.Contract(
+    getAbi("Store"),
+    storeAddress
+  );
+  const finalFee = (await store.methods.computeFinalFee(argv.collateralToken).call()).toString();
+  console.log("final fee:", finalFee);
+  const proposerBond = argv.optimisticOracleProposerBond ? argv.optimisticOracleProposerBond : finalFee;
+
+  // Set FPL.
+  const fpl = argv.fpl ? await getAddress(argv.fpl + "LongShortPairFinancialProductLibrary", networkId) : '';
+  console.log("fpl:", fpl);
+  const financialProductLibrary = argv.financialProductLibraryAddress ? argv.financialProductLibraryAddress.toString() : fpl;
 
   // LSP parameters. Pass in arguments to customize these.
   const lspParams = {
+    pairName: argv.pairName,
     expirationTimestamp: argv.expirationTimestamp, // Timestamp that the contract will expire at.
     collateralPerPair: argv.collateralPerPair,
     priceIdentifier: padRight(utf8ToHex(argv.priceIdentifier.toString()), 64), // Price identifier to use.
-    syntheticName: argv.syntheticName, // Long name.
-    syntheticSymbol: argv.syntheticSymbol, // Short name.
+    longSynthName: argv.longSynthName,
+    longSynthSymbol: argv.longSynthSymbol,
+    shortSynthName: argv.shortSynthName,
+    shortSynthSymbol: argv.shortSynthSymbol,
     collateralToken: argv.collateralToken.toString(), // Collateral token address.
-    financialProductLibrary: argv.financialProductLibrary,
+    financialProductLibrary: financialProductLibrary,
     customAncillaryData: utf8ToHex(ancillaryData), // Default to empty bytes array if no ancillary data is passed.
-    prepaidProposerReward: proposerReward // Default to 0 if no prepaid proposer reward is passed.
+    prepaidProposerReward: proposerReward, // Default to 0 if no prepaid proposer reward is passed.
+    optimisticOracleLivenessTime: livenessTime,
+    optimisticOracleProposerBond: proposerBond
   };
 
   console.log("params:", lspParams);
+
+  const lspCreatorAddress = argv.lspCreatorAddress ? argv.lspCreatorAddress : await getAddress("LongShortPairCreator", networkId);
+  console.log("creator address:", lspCreatorAddress);
 
   const lspCreator = new web3.eth.Contract(
     getAbi("LongShortPairCreator"),
     lspCreatorAddress
   );
 
-  console.log("network id:", networkId);
-
   // Transaction parameters
   const transactionOptions = {
     gas: 12000000, // 12MM is very high. Set this lower if you only have < 2 ETH or so in your wallet.
     gasPrice: argv.gasprice * 1000000000, // gasprice arg * 1 GWEI
-    from: account,
+    from: account
   };
+
+  console.log("transaction options:", transactionOptions);
 
   // Simulate transaction to test before sending to the network.
   console.log("Simulating Deployment...");
-  const address = await lspCreator.methods.createLongShortPair(...Object.values(lspParams)).call(transactionOptions);
+  const address = await lspCreator.methods.createLongShortPair(lspParams).call(transactionOptions);
   console.log("Simulation successful. Expected Address:", address);
 
   // Since the simulated transaction succeeded, send the real one to the network.
-  const { transactionHash } = await lspCreator.methods.createLongShortPair(...Object.values(lspParams)).send(transactionOptions);
+  const { transactionHash } = await lspCreator.methods.createLongShortPair(lspParams).send(transactionOptions);
   console.log("Deployed in transaction:", transactionHash);
   process.exit(0);
 })().catch((e) => {
