@@ -8,7 +8,7 @@ This launch repo currently is only for Kovan and Mumbai testnet LSP deployments.
 
 ## Install system dependencies
 
-You will need to install nodejs v14 and yarn. If you are testing on local fork with ganache, you will need to use node v12.
+You will need to install nodejs v14 and yarn.
 
 Note: these additional dependencies are required -- you may or may not have them on your system already:
 
