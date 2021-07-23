@@ -7,7 +7,7 @@
     "lint": "yarn run prettier --list-different",
     "lint-fix": "yarn run prettier --write",
     "prettier": "prettier './**/*.js' './**/*.md'",
-    "ganache-fork": "yarn ganache-cli -l 12000000 --fork"
+    "hardhat-fork": "yarn hardhat node --fork"
   },
   "author": "UMA Team",
   "license": "AGPL-3.0",
@@ -16,7 +16,7 @@
     "url": "https://github.com/UMAprotocol/launch-lsp.git"
   },
   "devDependencies": {
-    "ganache-cli": "6.11.0",
+    "hardhat": "^2.4.3",
     "prettier": "^2.2.1"
   },
   "dependencies": {
