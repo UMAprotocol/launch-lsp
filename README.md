@@ -1,4 +1,4 @@
-# Stub Package for Launching a New LSP
+# Package for Launching a New LSP
 
 The purpose of this repository/package is to make it easy to customize your LSP (Long-Short Pair) deployment. Feel free to use this repository in place or fork and customize it.
 
