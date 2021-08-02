@@ -20,10 +20,33 @@ const { parseFixed } = require("@ethersproject/bignumber");
 // --proposerReward: Proposal reward to be forwarded to the created contract to be used to incentivize price proposals.
 //
 // Example deployment script:
-// node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x566f98ECadE3EF95a6c5840621C43F15f403274c --pairName "UMA \$4-12 Range Token Pair August 2021" --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA \$4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --customAncillaryData "twapLength:3600" --optimisticOracleLivenessTime 3600 --fpl RangeBond
+// node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x566f98ECadE3EF95a6c5840621C43F15f403274c --pairName "UMA \$4-12 Range Token Pair August 2021" --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA \$4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --customAncillaryData "twapLength:3600" --optimisticOracleLivenessTime 3600 --fpl RangeBond --lowerBound 4000000000000000000 --upperBound 12000000000000000000
 
 const argv = require("minimist")(process.argv.slice(), {
-  string: ["url", "mnemonic", "lspCreatorAddress", "pairName", "expirationTimestamp", "collateralPerPair", "priceIdentifier", "longSynthName", "longSynthSymbol", "shortSynthName", "shortSynthSymbol", "collateralToken", "financialProductLibraryAddress", "fpl", "customAncillaryData", "prepaidProposerReward", "optimisticOracleLivenessTime", "optimisticOracleProposerBond", "gasprice"]
+  string: [
+    "url",
+    "mnemonic",
+    "lspCreatorAddress",
+    "pairName",
+    "expirationTimestamp",
+    "collateralPerPair",
+    "priceIdentifier",
+    "longSynthName",
+    "longSynthSymbol",
+    "shortSynthName",
+    "shortSynthSymbol",
+    "collateralToken",
+    "financialProductLibraryAddress",
+    "fpl",
+    "strikePrice",
+    "lowerBound",
+    "upperBound",
+    "customAncillaryData",
+    "prepaidProposerReward",
+    "optimisticOracleLivenessTime",
+    "optimisticOracleProposerBond",
+    "gasprice"
+  ]
 });
 
 if (!argv.gasprice) throw "--gasprice required (in GWEI)";
@@ -90,6 +113,9 @@ const livenessTime = argv.optimisticOracleLivenessTime ? argv.optimisticOracleLi
   const fpl = argv.fpl ? await getAddress(argv.fpl + "LongShortPairFinancialProductLibrary", networkId) : '';
   console.log("fpl:", fpl);
   const financialProductLibrary = argv.financialProductLibraryAddress ? argv.financialProductLibraryAddress.toString() : fpl;
+  if (argv.fpl && !argv.lowerBound && !argv.strikePrice) throw "--lowerBound or --strikePrice required";
+  if ((argv.fpl == 'RangeBond' || argv.fpl == 'Linear') && !argv.upperBound) throw "--upperBound required";
+  if (argv.lowerBound && argv.strikePrice) throw "you may specify --lowerBound or --strikePrice, but not both";
 
   // LSP parameters. Pass in arguments to customize these.
   const lspParams = {
@@ -123,7 +149,7 @@ const livenessTime = argv.optimisticOracleLivenessTime ? argv.optimisticOracleLi
   const transactionOptions = {
     gas: 12000000, // 12MM is very high. Set this lower if you only have < 2 ETH or so in your wallet.
     gasPrice: argv.gasprice * 1000000000, // gasprice arg * 1 GWEI
-    from: account
+    from: account,
   };
 
   console.log("transaction options:", transactionOptions);
@@ -136,6 +162,24 @@ const livenessTime = argv.optimisticOracleLivenessTime ? argv.optimisticOracleLi
   // Since the simulated transaction succeeded, send the real one to the network.
   const { transactionHash } = await lspCreator.methods.createLongShortPair(lspParams).send(transactionOptions);
   console.log("Deployed in transaction:", transactionHash);
+
+  // Set the FPL parameters.
+  if (fpl) {
+    console.log("Setting FPL parameters...");
+    // Set the deployed FPL address and lowerBound.
+    const deployedFPL = new web3.eth.Contract(getAbi(argv.fpl + "LongShortPairFinancialProductLibrary"),fpl);
+    const lowerBound = argv.lowerBound ? argv.lowerBound : argv.strikePrice;
+    // Set parameters depending on FPL type.
+    if (argv.fpl == 'RangeBond' || argv.fpl == 'Linear') {
+      const upperBound = argv.upperBound;
+      const { fplTransactionHash } = await deployedFPL.methods.setLongShortPairParameters(address,upperBound,lowerBound);
+      console.log("Financial product library parameters set in transaction:", transactionHash);
+    }
+    if (argv.fpl == 'BinaryOption' || argv.fpl == 'CappedYieldDollar' || argv.fpl == 'CoveredCall' || argv.fpl == 'SuccessToken') {
+      const { fplTransactionHash } = await deployedFPL.methods.setLongShortPairParameters(address,lowerBound);
+      console.log("Financial product library parameters set in transaction:", transactionHash);
+    }
+  }
   process.exit(0);
 })().catch((e) => {
   console.error(e);
