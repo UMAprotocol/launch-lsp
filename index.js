@@ -180,24 +180,31 @@ const livenessTime = argv.optimisticOracleLivenessTime ? argv.optimisticOracleLi
   if (fpl) {
     console.log("Setting FPL parameters...");
     // Set the deployed FPL address and lowerBound.
-    console.log("FPL address:", fpl);
+    console.log("fpl address:", fpl);
     const fplName = argv.fpl + "LongShortPairFinancialProductLibrary";
-    console.log("FPL name:", fplName);
+    console.log("fpl name:", fplName);
     const deployedFPL = new web3.eth.Contract(getAbi(fplName), fpl);
     const lowerBound = argv.lowerBound ? argv.lowerBound : argv.strikePrice;
     // Set parameters depending on FPL type.
+    if (argv.fpl == 'BinaryOption' || argv.fpl == 'CappedYieldDollar' || argv.fpl == 'CoveredCall' || argv.fpl == 'SuccessToken') {
+      const fplParams = [address, lowerBound];
+      console.log("fpl params:", {
+        address: fplParams[0],
+        lowerBound: fplParams[1]
+      });
+      const { transactionHash } = await deployedFPL.methods.setLongShortPairParameters(...fplParams).send(transactionOptions);
+      console.log("Financial product library parameters set in transaction:", transactionHash);
+    }
     if (argv.fpl == 'RangeBond' || argv.fpl == 'Linear') {
       const upperBound = argv.upperBound;
       const fplParams = [address, upperBound, lowerBound];
-      console.log("FPL params:", ...fplParams);
-      console.log("Transaction options:", transactionOptions);
-      const { fplTransactionHash } = await deployedFPL.methods.setLongShortPairParameters(...fplParams).send(transactionOptions);
-      console.log("Financial product library parameters set in transaction:", fplTransactionHash);
-    }
-    if (argv.fpl == 'BinaryOption' || argv.fpl == 'CappedYieldDollar' || argv.fpl == 'CoveredCall' || argv.fpl == 'SuccessToken') {
-      const fplParams = [address, lowerBound];
-      const { fplTransactionHash } = await deployedFPL.methods.setLongShortPairParameters(...fplParams).send(transactionOptions);
-      console.log("Financial product library parameters set in transaction:", fplTransactionHash);
+      console.log("fpl params:", {
+        address: fplParams[0],
+        upperBound: fplParams[1],
+        lowerBound: fplParams[2]
+      });
+      const { transactionHash } = await deployedFPL.methods.setLongShortPairParameters(...fplParams).send(transactionOptions);
+      console.log("Financial product library parameters set in transaction:", transactionHash);
     }
   }
   process.exit(0);
