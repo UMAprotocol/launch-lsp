@@ -7,7 +7,7 @@ const { parseFixed } = require("@ethersproject/bignumber");
 // --url: node url, by default points at http://localhost:8545.
 // --mnemonic: an account mnemonic you'd like to use. The script will default to using the node's unlocked accounts.
 // Mandatory arguments:
-// --lspCreatorAddress: deployed address of the creator contract you're calling. This will be set based on chain ID in future releases.
+// --lspCreatorAddress: deployed address of the creator contract you're calling. This will be set based on chain ID if not specified.
 // --gasprice: gas price to use in GWEI.
 // --expirationTimestamp: timestamp that the contract will expire at.
 // --collateralPerPair: how many units of collateral are required to mint one pair of synthetic tokens.
@@ -20,7 +20,7 @@ const { parseFixed } = require("@ethersproject/bignumber");
 // --proposerReward: Proposal reward to be forwarded to the created contract to be used to incentivize price proposals.
 //
 // Example deployment script:
-// node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x566f98ECadE3EF95a6c5840621C43F15f403274c --pairName "UMA \$4-12 Range Token Pair August 2021" --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA \$4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --customAncillaryData "twapLength:3600" --optimisticOracleLivenessTime 3600 --fpl RangeBond --lowerBound 4000000000000000000 --upperBound 12000000000000000000
+// node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --lspCreatorAddress 0x566f98ECadE3EF95a6c5840621C43F15f403274c --pairName "UMA \$4-12 Range Token Pair August 2021" --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA \$4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --customAncillaryData "twapLength:3600" --fpl RangeBond --lowerBound 4000000000000000000 --upperBound 12000000000000000000
 
 const argv = require("minimist")(process.argv.slice(), {
   string: [
