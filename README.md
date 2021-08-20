@@ -32,12 +32,42 @@ yarn
 Before running this command, you should customize the parameters to your needs. `YOUR_NODE_URL` should be filled in with a url for the network that you wish to deploy to and the `lspCreatorAddress` value should be substituted with the creator address on that same network. These creator addresses can be found in the `Contract Addresses` section. It is prefilled with the Ethereum mainnet `LongShortPairCreator` address.
 
 ```bash
-node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$4-12 Range Token Pair August 2021" --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA \$4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --customAncillaryData "twapLength:3600" --fpl RangeBond --lowerBound 4000000000000000000 --upperBound 12000000000000000000
+node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$4-12 Range Token Pair August 2021" --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA \$4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --customAncillaryData "twapLength:3600" --fpl RangeBond --lowerBound 4000000000000000000 --upperBound 12000000000000000000 --prepaidProposerBond 20000000000000000000 --optimisticOracleProposerBond --40000000000000000000
 ```
 
 ## Customize your deployment parameters
 
 You can customize all of the deployment parameters of the LSP simply by changing the parameters that you pass in the run command above. See [the script](./index.js) or [documentation](https://docs.umaproject.org/synthetic-tokens/long-short-pair#lsp-construction-parameters) for more details about these parameters.
+
+*Mandatory arguments:*
+```
+--url: node url, by default points at http://localhost:8545.
+--mnemonic: an account mnemonic you'd like to use. The script will default to using the node's unlocked accounts.
+--gasprice: Gas price to use in GWEI.
+--expirationTimestamp: Timestamp that the contract will expire at.
+--collateralPerPair: How many units of collateral are required to mint one pair of synthetic tokens.
+--priceIdentifier: Price identifier to use.
+--pairName: General name for the long-short token pair.
+--longSynthName: Long token name.
+--longSynthSymbol: Long token symbol.
+--shortSynthName: Short token name.
+--shortSynthSymbol: Short token symbol.
+--collateralToken: ERC20 token used as as collateral in the LSP.
+```
+
+*Optional arguments:*
+```
+--lspCreatorAddress: Deployed address of the creator contract you're calling. This will be set based on chain ID if not specified.
+--financialProductLibraryAddress: Contract providing settlement payout logic. Required if --fpl not included.
+--fpl: Name of the financial product library type, such as RangeBond or Linear. Required if --financialProductLibraryAddress not included.
+--customAncillaryData: Custom ancillary data to be passed along with the price request. If not needed, this should be left as a 0-length bytes array.
+--prepaidProposerReward: Proposal reward to be forwarded to the created contract to be used to incentivize price proposals.
+--optimisticOracleLivenessTime: Custom liveness window for disputing optimistic oracle price proposals. Longer provides more security, shorter provides faster settlement.
+--optimisticOracleProposerBond: Additional bond proposer must post with the optimistic oracle. A higher bond increases rewards to disputers if the price is incorrect.
+--strikePrice: Alias for lowerBound, used for certain financial product libraries with no upper bound. Cannot be included if --lowerBound is specified.
+--lowerBound: Lower bound of a price range for certain financial product libraries. Cannot be included if --strikePrice is specified.
+--upperBound: Upper bound of a price range for certain financial product libraries.
+```
 
 Your financial product library address will defines the payout function for your LSP. We have several [financial product libraries](https://github.com/UMAprotocol/protocol/tree/master/packages/core/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries) available for transforming the price, identifier, or collateral requirement of an LSP before or after expiry.
 
