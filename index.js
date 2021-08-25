@@ -28,6 +28,7 @@ const { parseFixed } = require("@ethersproject/bignumber");
 // --optimisticOracleLivenessTime: Custom liveness window for disputing optimistic oracle price proposals. Longer provides more security, shorter provides faster settlement.
 // --optimisticOracleProposerBond: Additional bond proposer must post with the optimistic oracle. A higher bond increases rewards to disputers if the price is incorrect.
 // --strikePrice: Alias for lowerBound, used for certain financial product libraries with no upper bound. Cannot be included if --lowerBound is specified.
+// --basePercentage: The percentage of collateral per pair used as the floor. This parameter is used with the 'SuccessToken' fpl where the remaining percentage functions like an embedded call option.
 // --lowerBound: Lower bound of a price range for certain financial product libraries. Cannot be included if --strikePrice is specified.
 // --upperBound: Upper bound of a price range for certain financial product libraries.
 // 
@@ -52,6 +53,7 @@ const argv = require("minimist")(process.argv.slice(), {
     "financialProductLibraryAddress",
     "fpl",
     "strikePrice",
+    "basePercentage",
     "lowerBound",
     "upperBound",
     "customAncillaryData",
@@ -128,6 +130,7 @@ const livenessTime = argv.optimisticOracleLivenessTime ? argv.optimisticOracleLi
   const financialProductLibrary = argv.financialProductLibraryAddress ? argv.financialProductLibraryAddress.toString() : fpl;
   if (argv.fpl && !argv.lowerBound && !argv.strikePrice) throw "--lowerBound or --strikePrice required";
   if ((argv.fpl == 'RangeBond' || argv.fpl == 'Linear') && !argv.upperBound) throw "--upperBound required";
+  if ((argv.fpl == 'SuccessToken') && !argv.basePercentage) throw "--basePercentage required";
   if (argv.lowerBound && argv.strikePrice) throw "you may specify --lowerBound or --strikePrice, but not both";
 
   // LSP parameters. Pass in arguments to customize these.
@@ -186,7 +189,7 @@ const livenessTime = argv.optimisticOracleLivenessTime ? argv.optimisticOracleLi
     const deployedFPL = new web3.eth.Contract(getAbi(fplName), fpl);
     const lowerBound = argv.lowerBound ? argv.lowerBound : argv.strikePrice;
     // Set parameters depending on FPL type.
-    if (argv.fpl == 'BinaryOption' || argv.fpl == 'CappedYieldDollar' || argv.fpl == 'CoveredCall' || argv.fpl == 'SuccessToken') {
+    if (argv.fpl == 'BinaryOption' || argv.fpl == 'CappedYieldDollar' || argv.fpl == 'CoveredCall' || argv.fpl == 'SimpleSuccessToken') {
       const fplParams = [address, lowerBound];
       console.log("fpl params:", {
         address: fplParams[0],
@@ -202,6 +205,17 @@ const livenessTime = argv.optimisticOracleLivenessTime ? argv.optimisticOracleLi
         address: fplParams[0],
         upperBound: fplParams[1],
         lowerBound: fplParams[2]
+      });
+      const { transactionHash } = await deployedFPL.methods.setLongShortPairParameters(...fplParams).send(transactionOptions);
+      console.log("Financial product library parameters set in transaction:", transactionHash);
+    }
+    if (argv.fpl == 'SuccessToken') {
+      const basePercentage = argv.basePercentage;
+      const fplParams = [address, lowerBound, basePercentage];
+      console.log("fpl params:", {
+        address: fplParams[0],
+        lowerBound: fplParams[1],
+        basePercentage: fplParams[2]
       });
       const { transactionHash } = await deployedFPL.methods.setLongShortPairParameters(...fplParams).send(transactionOptions);
       console.log("Financial product library parameters set in transaction:", transactionHash);
