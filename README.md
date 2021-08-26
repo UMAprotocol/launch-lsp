@@ -29,7 +29,7 @@ yarn
 
 ## Run the deployment script
 
-For each financial product library below, a description and example deployment script have been created to be used as a reference. Before running the deployment script command, you should customize the parameters to your needs. `YOUR_NODE_URL` should be filled in with a url for the network that you wish to deploy to. 
+For each financial product library below, a description and example deployment script have been created to be used as a reference. Before running the deployment script command, you should customize the parameters to your needs. `YOUR_NODE_URL` should be filled in with a node url for the network that you wish to deploy to. 
 
 ## Customize your deployment parameters
 
@@ -37,7 +37,7 @@ You can customize all of the deployment parameters of the LSP simply by changing
 
 *Mandatory arguments:*
 ```
---url: node url, by default points at http://localhost:8545.
+--url: node url for the network you wish to deploy to. 
 --mnemonic: an account mnemonic you'd like to use. The script will default to using the node's unlocked accounts.
 --gasprice: Gas price to use in GWEI.
 --expirationTimestamp: Timestamp that the contract will expire at.
@@ -88,7 +88,7 @@ For example, consider a covered call option collateralized in ETH, with a strike
 
  * If the price is less than 3000 then each long is worth 0 and each short is worth collateralPerPair.
  * If the price is more than 3000 then each long is worth the fraction of collateralPerPair that was in the money and each short is worth the remaining collateralPerPair.
- * Say settlement price is 3500.  Then `expiryPercentLong = (3500 - 3000) / 3500 = 0.143`. The value of this 0.143 ETH is worth `0.143*3500=500` which is the percentage of the collateralPerPair that was above the strike price.
+ * Say settlement price is 3500.  Then `expiryPercentLong = (3500 - 3000) / 3500 = 0.143`.
 
 Specify this library with the flag `--fpl CoveredCall`. To set the fpl parameters for `CoveredCall`, use `--strikePrice` as shown in the example deployment script below:
 
