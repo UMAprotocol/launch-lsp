@@ -213,7 +213,7 @@ If you wish to deploy your own financial product library, fork the [protocol rep
 Then take the following steps to deploy and verify the contract with Hardhat.
 
 1. In the protocol repo, run `yarn` and `yarn build`.
-2. Add your MetaMask mnemonic to your environment with `export MNEMONIC=your mnemonic string` or through an environment file.
+2. Add your wallet mnemonic to your environment with `export MNEMONIC=your mnemonic string` or through an environment file.
 3. Add your node url to your environment with `export CUSTOM_NODE_URL=your node url` or through an environment file. This should be filled in with a url for the network that you wish to deploy to. 
 4. From `core`, run `yarn hardhat console --network mainnet`.
 5. From the Hardhat console, run `deployments.deploy("CustomFinancialProductLibrary", { from: "0xYOURADDRESS" }).then(console.log)`
