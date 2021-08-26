@@ -2,9 +2,9 @@
 
 The purpose of this repository/package is to make it easy to customize your LSP (Long-Short Pair) deployment. Feel free to use this repository in place or fork and customize it.
 
-For more information on the LSP, [read the docs](https://umaproject.org/lsp.html).
+For more information on the LSP, [read the docs](https://docs.umaproject.org/synthetic-tokens/long-short-pair).
 
-This launch repo currently is only for Kovan and Mumbai testnet LSP deployments. This will soon be updated to include Ethereum mainnet and Polygon deployments.
+This launch repo currently supports LSP deployments on Mumbai testnet, Polygon, Kovan testnet and Ethereum Mainnet.
 
 ## Install system dependencies
 
