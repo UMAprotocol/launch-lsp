@@ -42,24 +42,23 @@ You can customize all of the deployment parameters of the LSP simply by changing
 --gasprice: Gas price to use in GWEI.
 --expirationTimestamp: Timestamp that the contract will expire at.
 --collateralPerPair: How many units of collateral are required to mint one pair of synthetic tokens.
---priceIdentifier: Price identifier to use.
---pairName: General name for the long-short token pair.
---longSynthName: Long token name.
+--priceIdentifier: The approved price identifier to be used.
+--pairName: The desired name of the token pair.
+--longSynthName: The full-length name of the long token.
 --longSynthSymbol: Long token symbol.
---shortSynthName: Short token name.
+--shortSynthName: The full-length name of the short token.
 --shortSynthSymbol: Short token symbol.
---collateralToken: ERC20 token used as collateral in the LSP.
+--collateralToken: Approved collateral currency to be used.
 ```
 
 *Optional arguments:*
 ```
---lspCreatorAddress: Deployed address of the creator contract you're calling. This will be set based on chain ID if not specified.
---financialProductLibraryAddress: Contract providing settlement payout logic. Required if --fpl not included.
---fpl: Name of the financial product library type, such as RangeBond or Linear. Required if --financialProductLibraryAddress not included.
---customAncillaryData: Custom ancillary data to be passed along with the price request. If not needed, this should be left as a 0-length bytes array.
+--fpl: Name of the financial product library type your contract will use to calculate the payment at expiry, such as RangeBond or Linear. Required if --financialProductLibraryAddress is not included.
+--financialProductLibraryAddress: Contract address providing settlement payout logic. Only required if a custom financial product library is used and --fpl is not included.
+--customAncillaryData: Custom ancillary data to be passed along with the price request. If not needed, this flag can be excluded and will be left as a 0-length bytes array.
 --prepaidProposerReward: Proposal reward to be forwarded to the created contract to be used to incentivize price proposals.
---optimisticOracleLivenessTime: Custom liveness window for disputing optimistic oracle price proposals. Longer provides more security, shorter provides faster settlement.
---optimisticOracleProposerBond: Additional bond proposer must post with the optimistic oracle. A higher bond increases rewards to disputers if the price is incorrect.
+--optimisticOracleLivenessTime: Custom liveness window for disputing optimistic oracle price proposals in seconds. A longer liveness time provides more security, while a shorter one provides faster settlement. By default, this is set to 7200 seconds.
+--optimisticOracleProposerBond: Additional bond proposer must post with the optimistic oracle. A higher bond makes incorrect disputes and proposals more costly.
 --strikePrice: Alias for lowerBound, used for certain financial product libraries with no upper bound. Cannot be included if --lowerBound is specified.
 --basePercentage: The percentage of collateral per pair used as the floor. This parameter is used with the 'SuccessToken' fpl where the remaining percentage functions like an embedded call option.
 --lowerBound: Lower bound of a price range for certain financial product libraries. Cannot be included if --strikePrice is specified.
@@ -112,11 +111,11 @@ Specify this library with the flag `--fpl Linear`. To set the fpl parameters for
 node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$4-12 Linear Token Pair August 2021" --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Linear Token August 2021" --longSynthSymbol UMA-0821 --shortSynthName "UMA \$4-12 Linear Short Token August 2021" --shortSynthSymbol UMA-0821s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl Linear --lowerBound 4000000000000000000 --upperBound 12000000000000000000 --prepaidProposerBond 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
 ```
 
-### Range Bond
+### Range Token
 
-A range bond is the combination of a Yield dollar, short put option and long call option enabling the token sponsor to issue structured products to unlock DeFi treasuries.
+A range token is the combination of a yield dollar, short put option and long call option enabling the token sponsor to issue structured products to unlock DeFi treasuries.
 
-A range bond is defined as equal to a Yield Dollar - Put Option + Call option. Numerically this is found using:
+A range token is defined as equal to a Yield Dollar - Put Option + Call Option. Numerically this is found using:
  * N = Notional of bond
  * P = price of token
  * T = number of tokens
@@ -134,7 +133,7 @@ The expression for the number of tokens paid out to the long side (T above) can 
 
 With this equation, the contract deployer does not need to specify the bond notional N. The notional can be calculated by taking `R1*collateralPerPair` from the LSP.
 
-When deploying the Range Bond, you should set `collateralPerPair` to `R1/N`.
+When deploying the range token, you should set `collateralPerPair` to `R1/N`.
 
 For example, if the low price in the range is `$4` and the notional of the bond is `$1`, you should set `collateralPerPair` to `0.25` (`250000000000000000`, with 1e18 decimals).
 
@@ -148,7 +147,7 @@ node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 wo
 
 ### Capped Yield Dollar
 
-A capped yield dollar is similar to a range bond except it does not have the embedded call option. The combination of a Yield dollar and short put option enables the token sponsor to issue structured products to unlock DeFi treasuries.
+A capped yield dollar is similar to a range token except it does not have the embedded call option. The combination of a yield dollar and short put option enables the token sponsor to issue structured products to unlock DeFi treasuries.
 
 A capped yield dollar is defined as equal to a Yield Dollar - Put Option. For the capped yield dollar to be fully collateralized and non-liquidatable, there is a low price for the collateral token below which the capped yield dollar will be worth < $1. Numerically this is found using:
  * N = Notional of bond
