@@ -65,7 +65,6 @@ const argv = require("minimist")(process.argv.slice(), {
   boolean: [ "simulate" ]
 });
 
-if (!argv.simulate) { console.log('YES') };
 if (!argv.gasprice) throw "--gasprice required (in GWEI)";
 // if (typeof argv.gasprice !== "number") throw "--gasprice must be a number";
 if (argv.gasprice < 1 || argv.gasprice > 1000) throw "--gasprice must be between 1 and 1000 (GWEI)";
