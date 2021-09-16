@@ -31,6 +31,7 @@ const { parseFixed } = require("@ethersproject/bignumber");
 // --basePercentage: The percentage of collateral per pair used as the floor. This parameter is used with the 'SuccessToken' fpl where the remaining percentage functions like an embedded call option.
 // --lowerBound: Lower bound of a price range for certain financial product libraries. Cannot be included if --strikePrice is specified.
 // --upperBound: Upper bound of a price range for certain financial product libraries.
+// --simulate: Boolean telling if the script should only simulate the transactions without sending them to the network.
 // 
 //
 // Example deployment script:
