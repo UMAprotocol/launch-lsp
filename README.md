@@ -63,6 +63,7 @@ You can customize all of the deployment parameters of the LSP simply by changing
 --basePercentage: The percentage of collateral per pair used as the floor. This parameter is used with the 'SuccessToken' fpl where the remaining percentage functions like an embedded call option.
 --lowerBound: Lower bound of a price range for certain financial product libraries. Cannot be included if --strikePrice is specified.
 --upperBound: Upper bound of a price range for certain financial product libraries.
+--simulate: Boolean telling if the script should only simulate the transactions without sending them to the network.
 ```
 
 Your financial product library address defines the payout function for your LSP. We have several [financial product libraries](https://github.com/UMAprotocol/protocol/tree/master/packages/core/contracts/financial-templates/common/financial-product-libraries/long-short-pair-libraries) available for transforming the price, identifier, or collateral requirement of an LSP before or after expiry.

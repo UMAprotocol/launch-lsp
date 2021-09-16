@@ -31,6 +31,7 @@ const { parseFixed } = require("@ethersproject/bignumber");
 // --basePercentage: The percentage of collateral per pair used as the floor. This parameter is used with the 'SuccessToken' fpl where the remaining percentage functions like an embedded call option.
 // --lowerBound: Lower bound of a price range for certain financial product libraries. Cannot be included if --strikePrice is specified.
 // --upperBound: Upper bound of a price range for certain financial product libraries.
+// --simulate: Boolean telling if the script should only simulate the transactions without sending them to the network.
 // 
 //
 // Example deployment script:
@@ -61,7 +62,8 @@ const argv = require("minimist")(process.argv.slice(), {
     "optimisticOracleLivenessTime",
     "optimisticOracleProposerBond",
     "gasprice"
-  ]
+  ],
+  boolean: [ "simulate" ]
 });
 
 if (!argv.gasprice) throw "--gasprice required (in GWEI)";
@@ -176,8 +178,10 @@ const livenessTime = argv.optimisticOracleLivenessTime ? argv.optimisticOracleLi
   console.log("Simulation successful. Expected Address:", address);
 
   // Since the simulated transaction succeeded, send the real one to the network.
-  const { transactionHash } = await lspCreator.methods.createLongShortPair(lspParams).send(transactionOptions);
-  console.log("Deployed in transaction:", transactionHash);
+  if (!argv.simulate) {
+    const { transactionHash } = await lspCreator.methods.createLongShortPair(lspParams).send(transactionOptions);
+    console.log("Deployed in transaction:", transactionHash);
+  }
 
   // Set the FPL parameters.
   if (fpl) {
@@ -195,8 +199,10 @@ const livenessTime = argv.optimisticOracleLivenessTime ? argv.optimisticOracleLi
         address: fplParams[0],
         lowerBound: fplParams[1]
       });
-      const { transactionHash } = await deployedFPL.methods.setLongShortPairParameters(...fplParams).send(transactionOptions);
-      console.log("Financial product library parameters set in transaction:", transactionHash);
+      if (!argv.simulate) {
+        const { transactionHash } = await deployedFPL.methods.setLongShortPairParameters(...fplParams).send(transactionOptions);
+        console.log("Financial product library parameters set in transaction:", transactionHash);
+      }
     }
     if (argv.fpl == 'RangeBond' || argv.fpl == 'Linear') {
       const upperBound = argv.upperBound;
@@ -206,8 +212,10 @@ const livenessTime = argv.optimisticOracleLivenessTime ? argv.optimisticOracleLi
         upperBound: fplParams[1],
         lowerBound: fplParams[2]
       });
-      const { transactionHash } = await deployedFPL.methods.setLongShortPairParameters(...fplParams).send(transactionOptions);
-      console.log("Financial product library parameters set in transaction:", transactionHash);
+      if (!argv.simulate) {
+        const { transactionHash } = await deployedFPL.methods.setLongShortPairParameters(...fplParams).send(transactionOptions);
+        console.log("Financial product library parameters set in transaction:", transactionHash);
+      }
     }
     if (argv.fpl == 'SuccessToken') {
       const basePercentage = argv.basePercentage;
@@ -217,8 +225,10 @@ const livenessTime = argv.optimisticOracleLivenessTime ? argv.optimisticOracleLi
         lowerBound: fplParams[1],
         basePercentage: fplParams[2]
       });
-      const { transactionHash } = await deployedFPL.methods.setLongShortPairParameters(...fplParams).send(transactionOptions);
-      console.log("Financial product library parameters set in transaction:", transactionHash);
+      if (!argv.simulate) {
+        const { transactionHash } = await deployedFPL.methods.setLongShortPairParameters(...fplParams).send(transactionOptions);
+        console.log("Financial product library parameters set in transaction:", transactionHash);
+      }
     }
   }
   process.exit(0);
