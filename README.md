@@ -167,7 +167,7 @@ With this equation, the contract deployer does not need to specify the bond noti
 Specify this library with the flag `--fpl CappedYieldDollar`. To set the fpl parameters for `CappedYieldDollar`, use `--lowerBound` as shown in the example deployment script below:
 
 ```bash
-node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$4 Capped Yield Dollar Token Pair August 2022" --expirationTimestamp 1661983200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4 Capped Yield Dollar Token August 2022" --longSynthSymbol UMA-0821 --shortSynthName "UMA \$4 Capped Yield Dollar Short Token August 2022" --shortSynthSymbol UMA-0822s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl CappedYieldDollar --lowerBound 4000000000000000000 --prepaidProposerBond 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
+node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$4 Capped Yield Dollar Token Pair August 2022" --expirationTimestamp 1661983200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4 Capped Yield Dollar Token August 2022" --longSynthSymbol UMA-0822 --shortSynthName "UMA \$4 Capped Yield Dollar Short Token August 2022" --shortSynthSymbol UMA-0822s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl CappedYieldDollar --lowerBound 4000000000000000000 --prepaidProposerBond 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
 ```
 
 ### Success Token
