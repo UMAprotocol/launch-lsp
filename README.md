@@ -4,7 +4,7 @@ The purpose of this repository/package is to make it easy to customize your LSP 
 
 For more information on the LSP, [read the docs](https://docs.umaproject.org/synthetic-tokens/long-short-pair).
 
-This launch repo currently supports LSP deployments on Mumbai testnet, Polygon, Kovan testnet and Ethereum Mainnet.
+This launch repo currently supports LSP deployments on Mumbai testnet, Polygon, Kovan testnet, Rinkeby testnet, and Ethereum Mainnet.
 
 ## Install system dependencies
 
@@ -54,9 +54,10 @@ You can customize all of the deployment parameters of the LSP simply by changing
 *Optional arguments:*
 ```
 --fpl: Name of the financial product library type your contract will use to calculate the payment at expiry, such as RangeBond or Linear. Required if --financialProductLibraryAddress is not included.
+--enableEarlyExpiration: If set to true, the LSP contract can request to be settled early by calling the optimistic oracle. If not needed, the parameter will be set to false.
 --financialProductLibraryAddress: Contract address providing settlement payout logic. Only required if a custom financial product library is used and --fpl is not included.
 --customAncillaryData: Custom ancillary data to be passed along with the price request. If not needed, this flag can be excluded and will be left as a 0-length bytes array.
---prepaidProposerReward: Proposal reward to be forwarded to the created contract to be used to incentivize price proposals.
+--proposerReward: Proposal reward to be forwarded to the created contract to be used to incentivize price proposals.
 --optimisticOracleLivenessTime: Custom liveness window for disputing optimistic oracle price proposals in seconds. A longer liveness time provides more security, while a shorter one provides faster settlement. By default, this is set to 7200 seconds.
 --optimisticOracleProposerBond: Additional bond proposer must post with the optimistic oracle. A higher bond makes incorrect disputes and proposals more costly.
 --strikePrice: Alias for lowerBound, used for certain financial product libraries with no upper bound. Cannot be included if --lowerBound is specified.
@@ -77,7 +78,7 @@ Binary options settle with all collateral allocated to either the long or short 
 Specify this library with the flag `--fpl BinaryOption`. To set the fpl parameters for `BinaryOption`, use `--strikePrice` as shown in the example deployment script below:
 
 ```bash
-node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$12 Binary Option Token Pair August 2022" --expirationTimestamp 1661983200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$12 Binary Option Token August 2022" --longSynthSymbol UMA-0822 --shortSynthName "UMA \$12 Binary Option Short Token August 2022" --shortSynthSymbol UMA-0822s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl BinaryOption --strikePrice 12000000000000000000 --prepaidProposerBond 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
+node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$12 Binary Option Token Pair August 2022" --expirationTimestamp 1661983200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$12 Binary Option Token August 2022" --longSynthSymbol UMA-0822 --shortSynthName "UMA \$12 Binary Option Short Token August 2022" --shortSynthSymbol UMA-0822s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl BinaryOption --strikePrice 12000000000000000000 --proposerReward 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
 ```
 
 ### Covered Call
@@ -93,7 +94,7 @@ For example, consider a covered call option collateralized in ETH, with a strike
 Specify this library with the flag `--fpl CoveredCall`. To set the fpl parameters for `CoveredCall`, use `--strikePrice` as shown in the example deployment script below:
 
 ```bash
-node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$12 Covered Call Token Pair August 2022" --expirationTimestamp 1661983200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$12 Covered Call Token August 2022" --longSynthSymbol UMA-0822 --shortSynthName "UMA \$12 Covered Call Short Token August 2022" --shortSynthSymbol UMA-0822s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl CoveredCall --strikePrice 12000000000000000000 --prepaidProposerBond 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
+node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$12 Covered Call Token Pair August 2022" --expirationTimestamp 1661983200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$12 Covered Call Token August 2022" --longSynthSymbol UMA-0822 --shortSynthName "UMA \$12 Covered Call Short Token August 2022" --shortSynthSymbol UMA-0822s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl CoveredCall --strikePrice 12000000000000000000 --proposerReward 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
 ```
 
 ### Linear
@@ -109,7 +110,7 @@ At settlement, the expiryPercentLong would equal 1 (each long worth 1000 and sho
 Specify this library with the flag `--fpl Linear`. To set the fpl parameters for `Linear`, use `--lowerBound` and `--upperBound` as shown in the example deployment script below:
 
 ```bash
-node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$4-12 Linear Token Pair August 2022" --expirationTimestamp 1661983200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Linear Token August 2022" --longSynthSymbol UMA-0822 --shortSynthName "UMA \$4-12 Linear Short Token August 2022" --shortSynthSymbol UMA-0822s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl Linear --lowerBound 4000000000000000000 --upperBound 12000000000000000000 --prepaidProposerBond 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
+node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$4-12 Linear Token Pair August 2022" --expirationTimestamp 1661983200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Linear Token August 2022" --longSynthSymbol UMA-0822 --shortSynthName "UMA \$4-12 Linear Short Token August 2022" --shortSynthSymbol UMA-0822s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl Linear --lowerBound 4000000000000000000 --upperBound 12000000000000000000 --proposerReward 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
 ```
 
 ### Range Token
@@ -143,7 +144,7 @@ If the low price in the range is `$2` and the notional of the bond is `$100`, yo
 Specify this library with the flag `--fpl RangeBond`. To set the fpl parameters for `RangeBond`, use `--lowerBound` and `--upperBound` as shown in the example deployment script below:
 
 ```bash
-node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$4-12 Range Token Pair August 2022" --expirationTimestamp 1661983200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Range Token August 2022" --longSynthSymbol rtUMA-0822 --shortSynthName "UMA \$4-12 Range Short Token August 2022" --shortSynthSymbol rtUMA-0822s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl RangeBond --lowerBound 4000000000000000000 --upperBound 12000000000000000000 --prepaidProposerBond 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
+node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$4-12 Range Token Pair August 2022" --expirationTimestamp 1661983200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Range Token August 2022" --longSynthSymbol rtUMA-0822 --shortSynthName "UMA \$4-12 Range Short Token August 2022" --shortSynthSymbol rtUMA-0822s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl RangeBond --lowerBound 4000000000000000000 --upperBound 12000000000000000000 --proposerReward 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
 ```
 
 ### Capped Yield Dollar
@@ -167,7 +168,7 @@ With this equation, the contract deployer does not need to specify the bond noti
 Specify this library with the flag `--fpl CappedYieldDollar`. To set the fpl parameters for `CappedYieldDollar`, use `--lowerBound` as shown in the example deployment script below:
 
 ```bash
-node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$4 Capped Yield Dollar Token Pair August 2022" --expirationTimestamp 1661983200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4 Capped Yield Dollar Token August 2022" --longSynthSymbol UMA-0822 --shortSynthName "UMA \$4 Capped Yield Dollar Short Token August 2022" --shortSynthSymbol UMA-0822s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl CappedYieldDollar --lowerBound 4000000000000000000 --prepaidProposerBond 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
+node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$4 Capped Yield Dollar Token Pair August 2022" --expirationTimestamp 1661983200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4 Capped Yield Dollar Token August 2022" --longSynthSymbol UMA-0822 --shortSynthName "UMA \$4 Capped Yield Dollar Short Token August 2022" --shortSynthSymbol UMA-0822s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl CappedYieldDollar --lowerBound 4000000000000000000 --proposerReward 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
 ```
 
 ### Success Token
@@ -185,7 +186,7 @@ As an example, consider a success token collateralized with UMA and `basePercent
 Specify this library with the flag `--fpl SuccessToken`. To set the fpl parameters for `SuccessToken`, use `--strikePrice` and `--basePercentage` as shown in the example deployment script below:
 
 ```bash
-node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$12 Success Token Pair August 2022" --expirationTimestamp 1661983200 --collateralPerPair 1000000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$12 Success Token August 2022" --longSynthSymbol UMA-0822 --shortSynthName "UMA \$12 Success Short Token August 2022" --shortSynthSymbol UMA-0822s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl SuccessToken --strikePrice 12000000000000000000 --basePercentage 500000000000000000 --prepaidProposerBond 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
+node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$12 Success Token Pair August 2022" --expirationTimestamp 1661983200 --collateralPerPair 1000000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$12 Success Token August 2022" --longSynthSymbol UMA-0822 --shortSynthName "UMA \$12 Success Short Token August 2022" --shortSynthSymbol UMA-0822s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl SuccessToken --strikePrice 12000000000000000000 --basePercentage 500000000000000000 --proposerReward 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
 ```
 
 ### Simple Success Token
@@ -199,7 +200,7 @@ As an example, consider a success token collateralized with UMA and `collateralP
 Specify this library with the flag `--fpl SimpleSuccessToken`. To set the fpl parameters for `SimpleSuccessToken`, use `--strikePrice` as shown in the example deployment script below:
 
 ```bash
-node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$12 Success Token Pair August 2022" --expirationTimestamp 1661983200 --collateralPerPair 1000000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$12 Success Token August 2022" --longSynthSymbol UMA-0822 --shortSynthName "UMA \$12 Success Short Token August 2022" --shortSynthSymbol UMA-0822s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl SimpleSuccessToken --strikePrice 12000000000000000000 --prepaidProposerBond 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
+node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$12 Success Token Pair August 2022" --expirationTimestamp 1661983200 --collateralPerPair 1000000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$12 Success Token August 2022" --longSynthSymbol UMA-0822 --shortSynthName "UMA \$12 Success Short Token August 2022" --shortSynthSymbol UMA-0822s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --fpl SimpleSuccessToken --strikePrice 12000000000000000000 --proposerReward 20000000000000000000 --optimisticOracleProposerBond 40000000000000000000
 ```
 
 ### New Libraries

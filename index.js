@@ -1,6 +1,6 @@
 const Web3 = require("web3");
 const HDWalletProvider = require("@truffle/hdwallet-provider");
-const { getAbi, getAddress } = require("@uma/core");
+const { getAbi, getAddress } = require("@uma/contracts-node");
 const { parseFixed } = require("@ethersproject/bignumber");
 
 // Arguments:
@@ -22,9 +22,10 @@ const { parseFixed } = require("@ethersproject/bignumber");
 // Optional arguments:
 // --lspCreatorAddress: Deployed address of the creator contract you're calling. This will be set based on chain ID if not specified.
 // --financialProductLibraryAddress: Contract providing settlement payout logic. Required if --fpl not included.
+// --enableEarlyExpiration: If set to true, the LSP contract can request to be settled early by calling the optimistic oracle. If not needed, the parameter will be set to false.
 // --fpl: Name of the financial product library type, such as RangeBond or Linear. Required if --financialProductLibraryAddress not included.
 // --customAncillaryData: Custom ancillary data to be passed along with the price request. If not needed, this should be left as a 0-length bytes array.
-// --prepaidProposerReward: Proposal reward to be forwarded to the created contract to be used to incentivize price proposals.
+// --proposerReward: Proposal reward to be forwarded to the created contract to be used to incentivize price proposals.
 // --optimisticOracleLivenessTime: Custom liveness window for disputing optimistic oracle price proposals. Longer provides more security, shorter provides faster settlement.
 // --optimisticOracleProposerBond: Additional bond proposer must post with the optimistic oracle. A higher bond increases rewards to disputers if the price is incorrect.
 // --strikePrice: Alias for lowerBound, used for certain financial product libraries with no upper bound. Cannot be included if --lowerBound is specified.
@@ -35,7 +36,7 @@ const { parseFixed } = require("@ethersproject/bignumber");
 // 
 //
 // Example deployment script:
-// node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$4-12 Range Token Pair August 2021" --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA \$4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --customAncillaryData "twapLength:3600" --fpl RangeBond --lowerBound 4000000000000000000 --upperBound 12000000000000000000 --prepaidProposerBond 20000000000000000000 --optimisticOracleProposerBond --40000000000000000000
+// node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$4-12 Range Token Pair August 2021" --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA \$4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --customAncillaryData "twapLength:3600" --fpl RangeBond --lowerBound 4000000000000000000 --upperBound 12000000000000000000 --proposerReward 20000000000000000000 --optimisticOracleProposerBond --40000000000000000000
 
 const argv = require("minimist")(process.argv.slice(), {
   string: [
@@ -58,12 +59,12 @@ const argv = require("minimist")(process.argv.slice(), {
     "lowerBound",
     "upperBound",
     "customAncillaryData",
-    "prepaidProposerReward",
+    "proposerReward",
     "optimisticOracleLivenessTime",
     "optimisticOracleProposerBond",
     "gasprice"
   ],
-  boolean: [ "simulate" ]
+  boolean: [ "simulate", "enableEarlyExpiration" ]
 });
 
 if (!argv.gasprice) throw "--gasprice required (in GWEI)";
@@ -82,8 +83,9 @@ if (!argv.collateralToken) throw "--collateralToken required";
 if (!argv.financialProductLibraryAddress && !argv.fpl) throw "either --financialProductLibraryAddress or --fpl required";
 
 const ancillaryData = argv.customAncillaryData ? argv.customAncillaryData : "";
-const proposerReward = argv.prepaidProposerReward ? argv.prepaidProposerReward : 0;
+const proposerReward = argv.proposerReward ? argv.proposerReward : 0;
 const livenessTime = argv.optimisticOracleLivenessTime ? argv.optimisticOracleLivenessTime : 7200;
+const earlyExpiration = argv.enableEarlyExpiration ? argv.enableEarlyExpiration : false;
 
 // Wrap everything in an async function to allow the use of async/await.
 (async () => {
@@ -148,9 +150,10 @@ const livenessTime = argv.optimisticOracleLivenessTime ? argv.optimisticOracleLi
     collateralToken: argv.collateralToken.toString(), // Collateral token address.
     financialProductLibrary: financialProductLibrary,
     customAncillaryData: utf8ToHex(ancillaryData), // Default to empty bytes array if no ancillary data is passed.
-    prepaidProposerReward: proposerReward, // Default to 0 if no prepaid proposer reward is passed.
+    proposerReward: proposerReward, // Default to 0 if no proposer reward is passed.
     optimisticOracleLivenessTime: livenessTime,
-    optimisticOracleProposerBond: proposerBond
+    optimisticOracleProposerBond: proposerBond,
+    enableEarlyExpiration: earlyExpiration // Default to false if true is not passed
   };
 
   console.log("params:", lspParams);
