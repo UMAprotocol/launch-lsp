@@ -168,7 +168,7 @@ const earlyExpiration = argv.enableEarlyExpiration ? argv.enableEarlyExpiration 
 
   // Transaction parameters
   const transactionOptions = {
-    gas: 12000000, // 12MM is very high. Set this lower if you only have < 2 ETH or so in your wallet.
+    gas: 10000000, // 10MM is very high. Set this lower if you only have < 2 ETH or so in your wallet.
     gasPrice: argv.gasprice * 1000000000, // gasprice arg * 1 GWEI
     from: account,
   };
