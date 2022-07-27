@@ -188,7 +188,7 @@ const earlyExpiration = argv.enableEarlyExpiration ? argv.enableEarlyExpiration 
   let address;
   if (!argv.simulate) {
     const { transactionHash } = await lspCreator.methods.createLongShortPair(lspParams).send(transactionOptions);
-    address = (await longShortPairCreator.getPastEvents("CreatedLongShortPair"))[0].returnValues.longShortPair;
+    address = (await lspCreator.getPastEvents("CreatedLongShortPair"))[0].returnValues.longShortPair;
     console.log("Deployed in transaction:", transactionHash, "LSP Address:", address);
   }
 
