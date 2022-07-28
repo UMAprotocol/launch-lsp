@@ -180,11 +180,6 @@ const earlyExpiration = argv.enableEarlyExpiration ? argv.enableEarlyExpiration 
   await lspCreator.methods.createLongShortPair(lspParams).call(transactionOptions);
 
   // Since the simulated transaction succeeded, send the real one to the network.
-  if (!argv.simulate) {
-    const { transactionHash } = await lspCreator.methods.createLongShortPair(lspParams).send(transactionOptions);
-    console.log("Deployed in transaction:", transactionHash);
-  }
-
   let address;
   if (!argv.simulate) {
     const { transactionHash } = await lspCreator.methods.createLongShortPair(lspParams).send(transactionOptions);
