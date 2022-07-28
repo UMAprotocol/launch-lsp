@@ -184,7 +184,7 @@ const earlyExpiration = argv.enableEarlyExpiration ? argv.enableEarlyExpiration 
   if (!argv.simulate) {
     const { transactionHash } = await lspCreator.methods.createLongShortPair(lspParams).send(transactionOptions);
     address = (await lspCreator.getPastEvents("CreatedLongShortPair"))[0].returnValues.longShortPair;
-    console.log("Deployed in transaction:", transactionHash, "LSP Address:", address);
+    console.log("Deployed in transaction:", transactionHash, " LSP Address:", address);
   }
 
   // Set the FPL parameters.
