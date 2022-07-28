@@ -33,7 +33,7 @@ const { parseFixed } = require("@ethersproject/bignumber");
 // --lowerBound: Lower bound of a price range for certain financial product libraries. Cannot be included if --strikePrice is specified.
 // --upperBound: Upper bound of a price range for certain financial product libraries.
 // --simulate: Boolean telling if the script should only simulate the transactions without sending them to the network.
-//
+// 
 //
 // Example deployment script:
 // node index.js --gasprice 80 --url YOUR_NODE_URL --mnemonic "your mnemonic (12 word seed phrase)" --pairName "UMA \$4-12 Range Token Pair August 2021" --expirationTimestamp 1630447200 --collateralPerPair 250000000000000000 --priceIdentifier UMAUSD --longSynthName "UMA \$4-12 Range Token August 2021" --longSynthSymbol rtUMA-0821 --shortSynthName "UMA \$4-12 Range Short Token August 2021" --shortSynthSymbol rtUMA-0821s --collateralToken 0x489Bf230d4Ab5c2083556E394a28276C22c3B580 --customAncillaryData "twapLength:3600" --fpl RangeBond --lowerBound 4000000000000000000 --upperBound 12000000000000000000 --proposerReward 20000000000000000000 --optimisticOracleProposerBond --40000000000000000000
@@ -62,9 +62,9 @@ const argv = require("minimist")(process.argv.slice(), {
     "proposerReward",
     "optimisticOracleLivenessTime",
     "optimisticOracleProposerBond",
-    "gasprice",
+    "gasprice"
   ],
-  boolean: ["simulate", "enableEarlyExpiration"],
+  boolean: [ "simulate", "enableEarlyExpiration" ]
 });
 
 if (!argv.gasprice) throw "--gasprice required (in GWEI)";
@@ -80,8 +80,7 @@ if (!argv.longSynthSymbol) throw "--longSynthSymbol required";
 if (!argv.shortSynthName) throw "--shortSynthName required";
 if (!argv.shortSynthSymbol) throw "--shortSynthSymbol required";
 if (!argv.collateralToken) throw "--collateralToken required";
-if (!argv.financialProductLibraryAddress && !argv.fpl)
-  throw "either --financialProductLibraryAddress or --fpl required";
+if (!argv.financialProductLibraryAddress && !argv.fpl) throw "either --financialProductLibraryAddress or --fpl required";
 
 const ancillaryData = argv.customAncillaryData ? argv.customAncillaryData : "";
 const proposerReward = argv.proposerReward ? argv.proposerReward : 0;
@@ -113,25 +112,29 @@ const earlyExpiration = argv.enableEarlyExpiration ? argv.enableEarlyExpiration 
   console.log("network id:", networkId);
 
   // Grab collateral decimals.
-  const collateral = new web3.eth.Contract(getAbi("IERC20Standard"), argv.collateralToken);
+  const collateral = new web3.eth.Contract(
+    getAbi("IERC20Standard"),
+    argv.collateralToken
+  );
   const decimals = (await collateral.methods.decimals().call()).toString();
 
   // Get the final fee for the collateral type to use as default proposer bond.
   const storeAddress = await getAddress("Store", networkId);
-  const store = new web3.eth.Contract(getAbi("Store"), storeAddress);
+  const store = new web3.eth.Contract(
+    getAbi("Store"),
+    storeAddress
+  );
   const finalFee = (await store.methods.computeFinalFee(argv.collateralToken).call()).toString();
   console.log("final fee:", finalFee);
   const proposerBond = argv.optimisticOracleProposerBond ? argv.optimisticOracleProposerBond : finalFee;
 
   // Set FPL.
-  const fpl = argv.fpl ? await getAddress(argv.fpl + "LongShortPairFinancialProductLibrary", networkId) : "";
+  const fpl = argv.fpl ? await getAddress(argv.fpl + "LongShortPairFinancialProductLibrary", networkId) : '';
   console.log("fpl:", fpl);
-  const financialProductLibrary = argv.financialProductLibraryAddress
-    ? argv.financialProductLibraryAddress.toString()
-    : fpl;
+  const financialProductLibrary = argv.financialProductLibraryAddress ? argv.financialProductLibraryAddress.toString() : fpl;
   if (argv.fpl && !argv.lowerBound && !argv.strikePrice) throw "--lowerBound or --strikePrice required";
-  if ((argv.fpl == "RangeBond" || argv.fpl == "Linear") && !argv.upperBound) throw "--upperBound required";
-  if (argv.fpl == "SuccessToken" && !argv.basePercentage) throw "--basePercentage required";
+  if ((argv.fpl == 'RangeBond' || argv.fpl == 'Linear') && !argv.upperBound) throw "--upperBound required";
+  if ((argv.fpl == 'SuccessToken') && !argv.basePercentage) throw "--basePercentage required";
   if (argv.lowerBound && argv.strikePrice) throw "you may specify --lowerBound or --strikePrice, but not both";
 
   // LSP parameters. Pass in arguments to customize these.
@@ -150,17 +153,18 @@ const earlyExpiration = argv.enableEarlyExpiration ? argv.enableEarlyExpiration 
     proposerReward: proposerReward, // Default to 0 if no proposer reward is passed.
     optimisticOracleLivenessTime: livenessTime,
     optimisticOracleProposerBond: proposerBond,
-    enableEarlyExpiration: earlyExpiration, // Default to false if true is not passed
+    enableEarlyExpiration: earlyExpiration // Default to false if true is not passed
   };
 
   console.log("params:", lspParams);
 
-  const lspCreatorAddress = argv.lspCreatorAddress
-    ? argv.lspCreatorAddress
-    : await getAddress("LongShortPairCreator", networkId);
+  const lspCreatorAddress = argv.lspCreatorAddress ? argv.lspCreatorAddress : await getAddress("LongShortPairCreator", networkId);
   console.log("creator address:", lspCreatorAddress);
 
-  const lspCreator = new web3.eth.Contract(getAbi("LongShortPairCreator"), lspCreatorAddress);
+  const lspCreator = new web3.eth.Contract(
+    getAbi("LongShortPairCreator"),
+    lspCreatorAddress
+  );
 
   // Transaction parameters
   const transactionOptions = {
@@ -193,51 +197,40 @@ const earlyExpiration = argv.enableEarlyExpiration ? argv.enableEarlyExpiration 
     const deployedFPL = new web3.eth.Contract(getAbi(fplName), fpl);
     const lowerBound = argv.lowerBound ? argv.lowerBound : argv.strikePrice;
     // Set parameters depending on FPL type.
-    if (
-      argv.fpl == "BinaryOption" ||
-      argv.fpl == "CappedYieldDollar" ||
-      argv.fpl == "CoveredCall" ||
-      argv.fpl == "SimpleSuccessToken"
-    ) {
+    if (argv.fpl == 'BinaryOption' || argv.fpl == 'CappedYieldDollar' || argv.fpl == 'CoveredCall' || argv.fpl == 'SimpleSuccessToken') {
       const fplParams = [address, lowerBound];
       console.log("fpl params:", {
         address: fplParams[0],
-        lowerBound: fplParams[1],
+        lowerBound: fplParams[1]
       });
       if (!argv.simulate) {
-        const { transactionHash } = await deployedFPL.methods
-          .setLongShortPairParameters(...fplParams)
-          .send(transactionOptions);
+        const { transactionHash } = await deployedFPL.methods.setLongShortPairParameters(...fplParams).send(transactionOptions);
         console.log("Financial product library parameters set in transaction:", transactionHash);
       }
     }
-    if (argv.fpl == "RangeBond" || argv.fpl == "Linear") {
+    if (argv.fpl == 'RangeBond' || argv.fpl == 'Linear') {
       const upperBound = argv.upperBound;
       const fplParams = [address, upperBound, lowerBound];
       console.log("fpl params:", {
         address: fplParams[0],
         upperBound: fplParams[1],
-        lowerBound: fplParams[2],
+        lowerBound: fplParams[2]
       });
       if (!argv.simulate) {
-        const { transactionHash } = await deployedFPL.methods
-          .setLongShortPairParameters(...fplParams)
-          .send(transactionOptions);
+        const { transactionHash } = await deployedFPL.methods.setLongShortPairParameters(...fplParams).send(transactionOptions);
         console.log("Financial product library parameters set in transaction:", transactionHash);
       }
     }
-    if (argv.fpl == "SuccessToken") {
+    if (argv.fpl == 'SuccessToken') {
       const basePercentage = argv.basePercentage;
       const fplParams = [address, lowerBound, basePercentage];
       console.log("fpl params:", {
         address: fplParams[0],
         lowerBound: fplParams[1],
-        basePercentage: fplParams[2],
+        basePercentage: fplParams[2]
       });
       if (!argv.simulate) {
-        const { transactionHash } = await deployedFPL.methods
-          .setLongShortPairParameters(...fplParams)
-          .send(transactionOptions);
+        const { transactionHash } = await deployedFPL.methods.setLongShortPairParameters(...fplParams).send(transactionOptions);
         console.log("Financial product library parameters set in transaction:", transactionHash);
       }
     }
