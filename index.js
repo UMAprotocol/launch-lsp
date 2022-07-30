@@ -182,9 +182,9 @@ const earlyExpiration = argv.enableEarlyExpiration ? argv.enableEarlyExpiration 
   // Since the simulated transaction succeeded, send the real one to the network.
   let address;
   if (!argv.simulate) {
-    const { transactionHash } = await lspCreator.methods.createLongShortPair(lspParams).send(transactionOptions);
-    address = (await lspCreator.getPastEvents("CreatedLongShortPair"))[0].returnValues.longShortPair;
-    console.log("Deployed in transaction:", transactionHash, " LSP Address:", address);
+    const result = await lspCreator.methods.createLongShortPair(lspParams).send(transactionOptions);
+    address = result.events.CreatedLongShortPair.returnValues.longShortPair;
+    console.log("Deployed in transaction:", result.transactionHash, " LSP Address:", address);
   }
 
   // Set the FPL parameters.
