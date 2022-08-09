@@ -2,7 +2,7 @@
 
 The purpose of this repository/package is to make it easy to customize your LSP (Long-Short Pair) deployment. Feel free to use this repository in place or fork and customize it.
 
-For more information on the LSP, [read the docs](https://docs.umaproject.org/synthetic-tokens/long-short-pair).
+For more information on the LSP, [read the docs](https://docs.umaproject.org/).
 
 This launch repo currently supports LSP deployments on Mumbai testnet, Polygon, Kovan testnet, Rinkeby testnet, and Ethereum Mainnet.
 
@@ -33,7 +33,7 @@ For each financial product library below, a description and example deployment s
 
 ## Customize your deployment parameters
 
-You can customize all of the deployment parameters of the LSP simply by changing the parameters that you pass in the run command. See [the script](./index.js) or [documentation](https://docs.umaproject.org/synthetic-tokens/long-short-pair#lsp-construction-parameters) for more details about these parameters.
+You can customize all of the deployment parameters of the LSP simply by changing the parameters that you pass in the run command. See [the script](./index.js) or [documentation](https://docs.outcome.finance/kpi-options/deployment-tutorial) for more details about these parameters.
 
 *Mandatory arguments:*
 ```
