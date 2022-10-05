@@ -2,7 +2,8 @@
 
 The purpose of this repository/package is to make it easy to customize your LSP (Long-Short Pair) deployment. Feel free to use this repository in place or fork and customize it.
 
-For more information on the LSP, [read the docs](https://docs.umaproject.org/).
+- For more information on the LSP, [read the Outcome.Finance docs](https://docs.outcome.finance/).
+- For more information on UMA's Optimistic Oracle and other integration patterns, read the [UMA docs](https://docs.umaproject.org/). 
 
 This launch repo currently supports LSP deployments on Mumbai testnet, Polygon, Kovan testnet, Rinkeby testnet, and Ethereum Mainnet.
 
